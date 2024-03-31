@@ -1,0 +1,9 @@
+Study
+/Users/morimotoakihito/Desktop/image app/image/
+60
+True
+
+60
+/Users/morimotoakihito/Desktop/image app/data.csv
+2
+5
