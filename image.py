@@ -4,6 +4,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from tkinter import filedialog
 from tkinter import messagebox
+import datetime
 
 import start
 
@@ -22,6 +23,7 @@ def create_image_setting_widgets():
     image_directory = start.load_settings(column=1)
     interval = start.load_settings(column=2)
     show_margin = start.load_settings(column=3)
+    automatic_brightness = start.load_settings(column=4)
     
     # デフォルトの表示間隔を設定
     interval_var = tk.StringVar()
@@ -34,6 +36,10 @@ def create_image_setting_widgets():
     # 余白表示のON/OFF状態を保持する変数
     show_margin_var = tk.BooleanVar()
     show_margin_var.set(show_margin)
+    
+    # 余白表示のON/OFF状態を保持する変数
+    automatic_brightness_var = tk.BooleanVar()
+    automatic_brightness_var.set(automatic_brightness)
 
     # ファイル選択ダイアログを表示する関数
     def select_path():
@@ -46,14 +52,15 @@ def create_image_setting_widgets():
         image_directory = path_var.get()
         interval = int(interval_var.get())
         show_margin = show_margin_var.get()
+        automatic_brightness = automatic_brightness_var.get()
 
         # 設定を保存
-        start.save_settings(image_directory=image_directory, image_interval=str(interval), show_margin=show_margin)
+        start.save_settings(image_directory=image_directory, image_interval=str(interval), show_margin=show_margin, automatic_brightness=automatic_brightness)
 
         root_start.destroy()
 
         try:
-            show_random_image(image_directory, interval, show_margin)
+            show_random_image(image_directory, interval, show_margin, automatic_brightness)
         except FileNotFoundError:
             messagebox.showerror("Error", "Image file not found!")
             create_image_setting_widgets()
@@ -84,9 +91,13 @@ def create_image_setting_widgets():
     tk.Label(settings_frame, text="Show Margin").grid(row=3, column=0, sticky="w")
     tk.Checkbutton(settings_frame, variable=show_margin_var).grid(row=3, column=1, sticky="w")
     
+    # 自動輝度調整のチェックボックス
+    tk.Label(settings_frame, text="Automatic Brightness").grid(row=4, column=0, sticky="w")
+    tk.Checkbutton(settings_frame, variable=automatic_brightness_var).grid(row=4, column=1, sticky="w")
+    
     # スタートボタン
     start_button = tk.Button(settings_frame, text="Start", command=start_action)
-    start_button.grid(row=4, columnspan=3, pady=10, sticky="nsew")
+    start_button.grid(row=5, columnspan=3, pady=10, sticky="nsew")
     
     # スペース
     image_label = tk.Label(root_start)
@@ -95,7 +106,7 @@ def create_image_setting_widgets():
     root_start.mainloop()
 
 
-def show_random_image(directory, interval, margin):
+def show_random_image(directory, interval, show_margin, automatic_brightness):
     """ランダムに画像を表示する関数"""
     image_files = [f for f in os.listdir(directory) if f.endswith(('.jpg', '.jpeg', '.png'))]
     root = tk.Tk()
@@ -128,11 +139,23 @@ def show_random_image(directory, interval, margin):
     
     def show_next_image():
         global root_after_id
-        if margin:
+        if show_margin:
             show_image_with_margin()
         else:
             show_image_without_margin()
         root_after_id = root.after(interval * 1000, show_next_image)
+
+        if automatic_brightness:
+            # 現在の時刻を取得
+            current_time = datetime.datetime.now().time()
+            # もし夜なら画面を暗くする
+            if is_night(current_time):
+                print("It's night.")
+                root.attributes('-alpha', 0.5)
+            else:
+                print("It's not night.")
+                root.attributes('-alpha', 1.0)
+
 
     def show_image_with_margin():
         random_image = random.choice(image_files)
@@ -183,3 +206,13 @@ def show_random_image(directory, interval, margin):
 
     root.mainloop()
 
+    def is_night(current_time):
+        # 夜の開始時間と終了時間を定義
+        night_start = datetime.time(21, 0)  # 21:00
+        night_end = datetime.time(6, 0)     # 06:00
+
+        # 現在の時刻が夜の時間帯に含まれるかどうかを確認
+        if current_time >= night_start or current_time < night_end:
+            return True
+        else:
+            return False

@@ -1,4 +1,4 @@
-# Media Display App
+# Image Display App
 
 ## Features
 

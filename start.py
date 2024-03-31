@@ -39,45 +39,52 @@ def load_settings(column = int):
                 except IndexError:
                     return "60"
             
-            # space
+            # margin
             if column == 3:
                 try:
                     return lines[3].strip()
                 except IndexError:
                     return False
             
-            # video_directory
+            # automatic brightness
             if column == 4:
                 try:
                     return lines[4].strip()
                 except IndexError:
-                    return ""
+                    return False
             
-            # video_interval
+            # video_directory
             if column == 5:
                 try:
                     return lines[5].strip()
                 except IndexError:
-                    return "60"
+                    return ""
             
-            # study_directory
+            # video_interval
             if column == 6:
                 try:
                     return lines[6].strip()
                 except IndexError:
-                    return ""
+                    return "60"
             
-            # study_answer_interval
+            # study_directory
             if column == 7:
                 try:
                     return lines[7].strip()
                 except IndexError:
-                    return "2"
+                    return ""
             
-            # study_change_interval
+            # study_answer_interval
             if column == 8:
                 try:
                     return lines[8].strip()
+                except IndexError:
+                    return "2"
+            
+            # study_change_interval
+            if column == 9:
+                try:
+                    return lines[9].strip()
                 except IndexError:
                     return "5"
 
@@ -92,18 +99,21 @@ def load_settings(column = int):
         if column == 3:
             return False
         if column == 4:
-            return ""
+            return False
         if column == 5:
-            return "60"
-        if column == 6:
             return ""
+        if column == 6:
+            return "60"
         if column == 7:
-            return "2"
+            return ""
         if column == 8:
+            return "2"
+        if column == 9:
             return "5"
 
 def save_settings(mode=None, image_directory=None,
                 image_interval=None, show_margin=None, 
+                automatic_brightness=None,
                 video_directory=None, video_interval=None,
                 study_file=None, study_answer_interval=None, 
                 study_change_interval=None):
@@ -120,20 +130,23 @@ def save_settings(mode=None, image_directory=None,
     if show_margin == None:
         show_margin = load_settings(column=3)
 
+    if automatic_brightness == None:
+        automatic_brightness = load_settings(column=4)
+
     if video_directory == None:
-        video_directory = load_settings(column=4)
+        video_directory = load_settings(column=5)
 
     if video_interval == None:
-        video_interval = load_settings(column=5)
+        video_interval = load_settings(column=6)
 
     if study_file == None:
-        study_file = load_settings(column=6)
+        study_file = load_settings(column=7)
 
     if study_answer_interval == None:
-        study_answer_interval = load_settings(column=7)
+        study_answer_interval = load_settings(column=8)
 
     if study_change_interval == None:
-        study_change_interval = load_settings(column=8)
+        study_change_interval = load_settings(column=9)
 
     with open(SETTINGS_FILE, "w") as f:
         # 書き込む
@@ -141,6 +154,7 @@ def save_settings(mode=None, image_directory=None,
         f.write(image_directory + "\n")
         f.write(image_interval + "\n")
         f.write(str(show_margin) + "\n")
+        f.write(str(automatic_brightness) + "\n")
         f.write(video_directory + "\n")
         f.write(video_interval + "\n")
         f.write(study_file + "\n")
