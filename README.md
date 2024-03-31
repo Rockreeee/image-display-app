@@ -35,6 +35,7 @@ python start.py
 - Image Directory: 画像が保存されているディレクトリを選択してください
 - Display Interval: 画像が切り替わるまでの時間
 - Show Margin: 余白を表示するか否か
+- Automatic Brightness: 明るさを自動調整するか否か（21:00に暗くなり、06:00に明るくなる）
 
 - \<Escape key>: 終了する
 - \<Space key>: 次の画像に移動する

@@ -8,11 +8,19 @@ import datetime
 
 import start
 
-root_after_id = ""
+root_after_id_1 = ""
+root_after_id_2 = ""
+root_after_id_3 = ""
 brightness = 1.0
 
 def cancel_root_after(root):
-    root.after_cancel(root_after_id)
+    root.after_cancel(root_after_id_1)
+
+    if root_after_id_2 != "":
+        root.after_cancel(root_after_id_2)
+
+    if root_after_id_3 != "":
+        root.after_cancel(root_after_id_3)
 
 def create_image_setting_widgets():
     """開始画面を生成する関数"""
@@ -136,26 +144,52 @@ def show_random_image(directory, interval, show_margin, automatic_brightness):
     
     label = tk.Label(root, bg='white')
     label.pack(fill=tk.BOTH, expand=True)
-    
-    def show_next_image():
-        global root_after_id
-        if show_margin:
-            show_image_with_margin()
+        
+    def calculate_time_next_trigger(target_hour, target_minute):
+        # 現在の時刻を取得
+        current_time = datetime.datetime.now()
+
+        # 次に発動させたい時間を計算
+        target_time = current_time.replace(hour=target_hour, minute=target_minute, second=0, microsecond=0)
+
+        # 現在の時刻から次の発動までの時間を計算
+        delta_time = target_time - current_time
+
+        total_seconds = delta_time.total_seconds()
+
+        return total_seconds
+
+    # 自動明るさ調整
+    def automatic_brightness_adjustment():
+        global root_after_id_2
+        global root_after_id_3
+
+        # 朝、夜までの時間計算
+        time_to_morning = calculate_time_next_trigger(6, 0)
+        time_to_night = calculate_time_next_trigger(21, 0)
+
+        # すでに夜の時
+        if time_to_night < 0 or time_to_morning > 0:
+            print("今は昼です")
+            root.attributes('-alpha', 0.5)
         else:
-            show_image_without_margin()
-        root_after_id = root.after(interval * 1000, show_next_image)
+            print("今は夜です")
+            root.attributes('-alpha', 1.0)
 
-        if automatic_brightness:
-            # 現在の時刻を取得
-            current_time = datetime.datetime.now().time()
-            # もし夜なら画面を暗くする
-            if is_night(current_time):
-                print("It's night.")
-                root.attributes('-alpha', 0.5)
-            else:
-                print("It's not night.")
-                root.attributes('-alpha', 1.0)
+        if time_to_morning < 0:
+            time_to_morning += 86400
 
+        if time_to_night < 0:
+            time_to_night += 86400
+
+        # 予約
+        print("画面が明るくなるまで：", int(time_to_morning))
+        print("画面が暗くなるまで：", int(time_to_night))
+        root_after_id_2 = root.after(int(time_to_morning) * 1000, automatic_brightness_adjustment)
+        root_after_id_3 = root.after(int(time_to_night) * 1000, automatic_brightness_adjustment)
+
+    if automatic_brightness:
+        automatic_brightness_adjustment()
 
     def show_image_with_margin():
         random_image = random.choice(image_files)
@@ -193,11 +227,19 @@ def show_random_image(directory, interval, show_margin, automatic_brightness):
         photo = ImageTk.PhotoImage(img)
         label.configure(image=photo)
         label.image = photo
+    
+    def show_next_image():
+        global root_after_id_1
+        if show_margin:
+            show_image_with_margin()
+        else:
+            show_image_without_margin()
+        root_after_id_1 = root.after(interval * 1000, show_next_image)
 
     show_next_image()
 
     def next_image(event):
-        if margin:
+        if show_margin:
             show_image_with_margin()
         else:
             show_image_without_margin()
@@ -205,14 +247,3 @@ def show_random_image(directory, interval, show_margin, automatic_brightness):
     root.bind("<space>", next_image)
 
     root.mainloop()
-
-    def is_night(current_time):
-        # 夜の開始時間と終了時間を定義
-        night_start = datetime.time(21, 0)  # 21:00
-        night_end = datetime.time(6, 0)     # 06:00
-
-        # 現在の時刻が夜の時間帯に含まれるかどうかを確認
-        if current_time >= night_start or current_time < night_end:
-            return True
-        else:
-            return False
