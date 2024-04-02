@@ -40,6 +40,7 @@ python start.py
 - \<Escape key>: 終了する
 - \<Space key>: 次の画像に移動する
 - \<b key>: 明るさ調整
+- \<f key>: ウィンドウ大きさ変更
 
 # Study mode
 - Study Directory: 画像が保存されているディレクトリを選択してください

@@ -1,17 +1,26 @@
 import os
 import random
 import tkinter as tk
-from PIL import Image, ImageTk
+from PIL import Image, ImageEnhance, ImageTk
 from tkinter import filedialog
 from tkinter import messagebox
 import datetime
 
 import start
 
+# 設定項目
+image_directory = ""
+interval = 0 
+show_margin = False
+automatic_brightness = False
+
 root_after_id_1 = ""
 root_after_id_2 = ""
 root_after_id_3 = ""
-brightness = 1.0
+label_brightness = 1.0
+
+image_path = ""
+image_brightness = 1.0
 
 def cancel_root_after(root):
     root.after_cancel(root_after_id_1)
@@ -57,6 +66,11 @@ def create_image_setting_widgets():
 
     # 開始ボタンのアクション
     def start_action():
+        global image_directory
+        global interval
+        global show_margin
+        global automatic_brightness
+        
         image_directory = path_var.get()
         interval = int(interval_var.get())
         show_margin = show_margin_var.get()
@@ -68,7 +82,7 @@ def create_image_setting_widgets():
         root_start.destroy()
 
         try:
-            show_random_image(image_directory, interval, show_margin, automatic_brightness)
+            show_random_image()
         except FileNotFoundError:
             messagebox.showerror("Error", "Image file not found!")
             create_image_setting_widgets()
@@ -114,14 +128,15 @@ def create_image_setting_widgets():
     root_start.mainloop()
 
 
-def show_random_image(directory, interval, show_margin, automatic_brightness):
+def show_random_image():
     """ランダムに画像を表示する関数"""
-    image_files = [f for f in os.listdir(directory) if f.endswith(('.jpg', '.jpeg', '.png'))]
+    image_files = [f for f in os.listdir(image_directory) if f.endswith(('.jpg', '.jpeg', '.png'))]
     root = tk.Tk()
     root.title("Image Display App")
-    root.attributes("-fullscreen", True)
+    
     root.configure(background='white')
     
+
     # 終了する時の関数
     def close_window(event):
         cancel_root_after(root)
@@ -131,17 +146,44 @@ def show_random_image(directory, interval, show_margin, automatic_brightness):
     # 終了する時のキーバインド
     root.bind("<Escape>", close_window)
 
+
     # 明るさを調整する関数
-    def brightness_adjustment(event):
-        global brightness
-        brightness -= 0.2
-        if brightness < 0:
-            brightness = 1
-        root.attributes('-alpha', brightness)
+    def label_brightness_adjustment(event):
+        global label_brightness
+        label_brightness -= 0.2
+        if label_brightness < 0:
+            label_brightness = 1
+        label.config(bg=f'#{int(label_brightness*255):02x}{int(label_brightness*255):02x}{int(label_brightness*255):02x}')  # 背景色を調整
     
     # 明るさを調整するキーバインド
-    root.bind("<b>", brightness_adjustment)
+    root.bind("<b>", label_brightness_adjustment)
+
+
+    # 明るさを調整する関数
+    def image_brightness_adjustment(event):
+        global image_brightness
+
+        image_brightness -= 0.2
+        if image_brightness < 0:
+            image_brightness = 1
+
+        if show_margin:
+            show_image_with_margin()
+        else:
+            show_image_without_margin()
+
+    # 明るさを調整するキーバインド
+    root.bind("<v>", image_brightness_adjustment)
+
+
+    # ウィンドウの大きさを調整
+    def toggle_fullscreen(event=None):
+        root.attributes("-fullscreen", not root.attributes("-fullscreen"))
+
+    # キーイベントをバインドしてフルスクリーン表示の切り替えを有効にする
+    root.bind("<f>", toggle_fullscreen)
     
+
     label = tk.Label(root, bg='white')
     label.pack(fill=tk.BOTH, expand=True)
         
@@ -163,6 +205,8 @@ def show_random_image(directory, interval, show_margin, automatic_brightness):
     def automatic_brightness_adjustment():
         global root_after_id_2
         global root_after_id_3
+        global image_brightness
+        global label_brightness
 
         # 朝、夜までの時間計算
         time_to_morning = calculate_time_next_trigger(6, 0)
@@ -170,11 +214,15 @@ def show_random_image(directory, interval, show_margin, automatic_brightness):
 
         # すでに夜の時
         if time_to_night < 0 or time_to_morning > 0:
-            print("今は昼です")
-            root.attributes('-alpha', 0.5)
-        else:
             print("今は夜です")
-            root.attributes('-alpha', 1.0)
+            image_brightness = 0.5
+            label_brightness = 0.5
+            label.config(bg=f'#{int(label_brightness*255):02x}{int(label_brightness*255):02x}{int(label_brightness*255):02x}')  # 背景色を調整
+        else:
+            print("今は昼です")
+            image_brightness = 1.0
+            label_brightness = 1.0
+            label.config(bg=f'#{int(label_brightness*255):02x}{int(label_brightness*255):02x}{int(label_brightness*255):02x}')  # 背景色を調整
 
         if time_to_morning < 0:
             time_to_morning += 86400
@@ -188,12 +236,26 @@ def show_random_image(directory, interval, show_margin, automatic_brightness):
         root_after_id_2 = root.after(int(time_to_morning) * 1000, automatic_brightness_adjustment)
         root_after_id_3 = root.after(int(time_to_night) * 1000, automatic_brightness_adjustment)
 
+
     if automatic_brightness:
         automatic_brightness_adjustment()
 
-    def show_image_with_margin():
+
+    # ランダムな御像を選ぶ関数
+    def select_random_image():
+        global image_path
+
         random_image = random.choice(image_files)
-        image_path = os.path.join(directory, random_image)
+        image_path = os.path.join(image_directory, random_image)
+        if show_margin:
+            show_image_with_margin()
+        else:
+            show_image_without_margin()
+
+
+    def show_image_with_margin():
+        global image_brightness
+
         img = Image.open(image_path)
         img_width, img_height = img.size
         screen_width = root.winfo_screenwidth()
@@ -206,13 +268,19 @@ def show_random_image(directory, interval, show_margin, automatic_brightness):
             new_height = int(img_height * ratio) - constant_margin
             img = img.resize((new_width, new_height), Image.ANTIALIAS)
         
-        photo = ImageTk.PhotoImage(img)
+        # 明るさを調整するためのBrightnessオブジェクトを作成し、ファクターを設定
+        enhancer = ImageEnhance.Brightness(img)
+        adjusted_image = enhancer.enhance(image_brightness)
+
+        # 画像を表示するラベルに設定
+        photo = ImageTk.PhotoImage(adjusted_image)
         label.configure(image=photo)
         label.image = photo
 
+
     def show_image_without_margin():
-        random_image = random.choice(image_files)
-        image_path = os.path.join(directory, random_image)
+        global image_brightness
+
         img = Image.open(image_path)
         img_width, img_height = img.size
         screen_width = root.winfo_screenwidth()
@@ -222,28 +290,32 @@ def show_random_image(directory, interval, show_margin, automatic_brightness):
         new_width = int(img_width * ratio)
         new_height = int(img_height * ratio)
         img = img.resize((new_width, new_height), Image.ANTIALIAS)
+        
+        # 明るさを調整するためのBrightnessオブジェクトを作成し、ファクターを設定
+        enhancer = ImageEnhance.Brightness(img)
+        adjusted_image = enhancer.enhance(image_brightness)
 
         # 画像を表示するラベルを作成し、中央に配置する
-        photo = ImageTk.PhotoImage(img)
+        photo = ImageTk.PhotoImage(adjusted_image)
         label.configure(image=photo)
         label.image = photo
     
+
     def show_next_image():
         global root_after_id_1
-        if show_margin:
-            show_image_with_margin()
-        else:
-            show_image_without_margin()
+        select_random_image()
         root_after_id_1 = root.after(interval * 1000, show_next_image)
 
     show_next_image()
 
+
+    # 次のイメージにする関数
     def next_image(event):
-        if show_margin:
-            show_image_with_margin()
-        else:
-            show_image_without_margin()
+        select_random_image()
         
     root.bind("<space>", next_image)
 
+
     root.mainloop()
+
+    
