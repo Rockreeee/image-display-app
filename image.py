@@ -209,7 +209,7 @@ def show_random_image():
         global label_brightness
 
         # 朝、夜までの時間計算
-        time_to_morning = calculate_time_next_trigger(6, 0)
+        time_to_morning = calculate_time_next_trigger(7, 0)
         time_to_night = calculate_time_next_trigger(21, 0)
 
         # すでに夜の時

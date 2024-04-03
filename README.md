@@ -35,12 +35,16 @@ python start.py
 - Image Directory: 画像が保存されているディレクトリを選択してください
 - Display Interval: 画像が切り替わるまでの時間
 - Show Margin: 余白を表示するか否か
-- Automatic Brightness: 明るさを自動調整するか否か（21:00に暗くなり、06:00に明るくなる）
+- Automatic Brightness: 明るさを自動調整するか否か（21:00に暗くなり、07:00に明るくなる）
 
 - \<Escape key>: 終了する
 - \<Space key>: 次の画像に移動する
-- \<b key>: 明るさ調整
+- \<b key>: 周りの枠の明るさ調整
+- \<v key>: imageの明るさ調整
 - \<f key>: ウィンドウ大きさ変更
+
+# Movie mode
+- 実装中
 
 # Study mode
 - Study Directory: 画像が保存されているディレクトリを選択してください
