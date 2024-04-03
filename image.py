@@ -215,8 +215,8 @@ def show_random_image():
         # すでに夜の時
         if time_to_night < 0 or time_to_morning > 0:
             print("今は夜です")
-            image_brightness = 0.5
-            label_brightness = 0.5
+            image_brightness = 0.2
+            label_brightness = 0
             label.config(bg=f'#{int(label_brightness*255):02x}{int(label_brightness*255):02x}{int(label_brightness*255):02x}')  # 背景色を調整
         else:
             print("今は昼です")
