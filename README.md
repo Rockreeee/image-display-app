@@ -1,6 +1,7 @@
 # Image Display App
 
 ## Features
+![Alt text](1.jpg)
 
 ## Requirement
 
