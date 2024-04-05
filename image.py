@@ -209,6 +209,20 @@ def show_random_image():
 
     # キーイベントをバインドしてフルスクリーン表示の切り替えを有効にする
     root.bind("<f>", toggle_fullscreen)
+
+
+    # ウィンドウの大きさを調整
+    def toggle_cursor(event=None):
+        cursor_state = root.cget("cursor")
+        print(cursor_state)
+
+        if cursor_state == "none":
+            root.config(cursor="arrow") 
+        else:
+            root.config(cursor="none")  # "none"はカーソルを非表示にする
+
+    # キーイベントをバインドしてカーソルを表示きりかえ
+    root.bind("<h>", toggle_cursor)
     
 
     label = tk.Label(root, bg='white')
@@ -295,11 +309,6 @@ def show_random_image():
         date_label_height = date_label.winfo_height()
         time_label.pack(pady=(date_label_height + 50, 0))  # 日付の下に配置
 
-        # # 次の更新までの待機時間を計算する関数
-        # def calculate_wait_time():
-        #     current_second = int(strftime('%S'))
-        #     return (60 - current_second) * 1000  # 次の分の最初までのミリ秒数を返す
-
         # 日付と曜日、時間を更新する関数
         def update_time():
             global root_after_id_4
@@ -307,8 +316,6 @@ def show_random_image():
             current_date = strftime('%Y-%m-%d %A', localtime())
             time_label.config(text=current_time)
             date_label.config(text=current_date)
-            # wait_time = calculate_wait_time() if strftime('%S') == '00' else 1000  # 次の分の最初までの待機時間を計算
-            # root_after_id_4 = root.after(wait_time, update_time)  # 次の更新まで待機
             root_after_id_4 = root.after(1000, update_time)  # 次の更新まで待機
 
         update_time()  # 初回の呼び出し

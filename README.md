@@ -43,6 +43,7 @@ python start.py
 - \<b key>: 周りの枠の明るさ調整
 - \<v key>: imageの明るさ調整
 - \<f key>: ウィンドウ大きさ変更
+- \<h key>: カーソル表示切り替え
 
 # Movie mode
 - 実装中
