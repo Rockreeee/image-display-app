@@ -3,6 +3,7 @@ Image
 60
 True
 True
+True
 
 60
 /Users/morimotoakihito/Desktop/image app/data.csv

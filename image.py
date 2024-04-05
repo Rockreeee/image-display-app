@@ -5,6 +5,7 @@ from PIL import Image, ImageEnhance, ImageTk
 from tkinter import filedialog
 from tkinter import messagebox
 import datetime
+from time import strftime, localtime
 
 import start
 
@@ -13,16 +14,24 @@ image_directory = ""
 interval = 0 
 show_margin = False
 automatic_brightness = False
+show_time = False
 
 root_after_id_1 = ""
 root_after_id_2 = ""
 root_after_id_3 = ""
+root_after_id_4 = ""
 label_brightness = 1.0
 
 image_path = ""
 image_brightness = 1.0
 
+date_label = None
+time_label = None
+
 def cancel_root_after(root):
+    global date_label
+    global time_label
+
     root.after_cancel(root_after_id_1)
 
     if root_after_id_2 != "":
@@ -30,6 +39,12 @@ def cancel_root_after(root):
 
     if root_after_id_3 != "":
         root.after_cancel(root_after_id_3)
+
+    if root_after_id_4 != "":
+        root.after_cancel(root_after_id_4)
+
+    date_label = None
+    time_label = None
 
 def create_image_setting_widgets():
     """開始画面を生成する関数"""
@@ -41,6 +56,7 @@ def create_image_setting_widgets():
     interval = start.load_settings(column=2)
     show_margin = start.load_settings(column=3)
     automatic_brightness = start.load_settings(column=4)
+    show_time = start.load_settings(column=5)
     
     # デフォルトの表示間隔を設定
     interval_var = tk.StringVar()
@@ -57,6 +73,10 @@ def create_image_setting_widgets():
     # 余白表示のON/OFF状態を保持する変数
     automatic_brightness_var = tk.BooleanVar()
     automatic_brightness_var.set(automatic_brightness)
+    
+    # 時間表示のON/OFF状態を保持する変数
+    show_time_var = tk.BooleanVar()
+    show_time_var.set(show_time)
 
     # ファイル選択ダイアログを表示する関数
     def select_path():
@@ -70,14 +90,18 @@ def create_image_setting_widgets():
         global interval
         global show_margin
         global automatic_brightness
+        global show_time
         
         image_directory = path_var.get()
         interval = int(interval_var.get())
         show_margin = show_margin_var.get()
         automatic_brightness = automatic_brightness_var.get()
+        show_time = show_time_var.get()
 
         # 設定を保存
-        start.save_settings(image_directory=image_directory, image_interval=str(interval), show_margin=show_margin, automatic_brightness=automatic_brightness)
+        start.save_settings(image_directory=image_directory, 
+        image_interval=str(interval), show_margin=show_margin, 
+        automatic_brightness=automatic_brightness, show_time=show_time)
 
         root_start.destroy()
 
@@ -117,9 +141,13 @@ def create_image_setting_widgets():
     tk.Label(settings_frame, text="Automatic Brightness").grid(row=4, column=0, sticky="w")
     tk.Checkbutton(settings_frame, variable=automatic_brightness_var).grid(row=4, column=1, sticky="w")
     
+    # 時間表示のチェックボックス
+    tk.Label(settings_frame, text="Show Time").grid(row=5, column=0, sticky="w")
+    tk.Checkbutton(settings_frame, variable=show_time_var).grid(row=5, column=1, sticky="w")
+
     # スタートボタン
     start_button = tk.Button(settings_frame, text="Start", command=start_action)
-    start_button.grid(row=5, columnspan=3, pady=10, sticky="nsew")
+    start_button.grid(row=6, columnspan=3, pady=10, sticky="nsew")
     
     # スペース
     image_label = tk.Label(root_start)
@@ -133,8 +161,6 @@ def show_random_image():
     image_files = [f for f in os.listdir(image_directory) if f.endswith(('.jpg', '.jpeg', '.png'))]
     root = tk.Tk()
     root.title("Image Display App")
-    
-    root.configure(background='white')
     
 
     # 終了する時の関数
@@ -154,6 +180,7 @@ def show_random_image():
         if label_brightness < 0:
             label_brightness = 1
         label.config(bg=f'#{int(label_brightness*255):02x}{int(label_brightness*255):02x}{int(label_brightness*255):02x}')  # 背景色を調整
+        set_time()
     
     # 明るさを調整するキーバインド
     root.bind("<b>", label_brightness_adjustment)
@@ -185,7 +212,7 @@ def show_random_image():
     
 
     label = tk.Label(root, bg='white')
-    label.pack(fill=tk.BOTH, expand=True)
+    label.pack(fill=tk.BOTH, expand=True, side="bottom")
         
     def calculate_time_next_trigger(target_hour, target_minute):
         # 現在の時刻を取得
@@ -240,6 +267,54 @@ def show_random_image():
     if automatic_brightness:
         automatic_brightness_adjustment()
 
+    # 時計表示
+    def set_time():
+        global date_label
+        global time_label
+
+        # 予約キャンセル
+        if root_after_id_4 !="":
+            root.after_cancel(root_after_id_4)
+        # 親ウィンドウの背景色を取得
+        parent_bg_color = label.cget('bg')
+        # 日付と曜日以外の背景色を変更
+        root.configure(background=parent_bg_color)
+        # 初期化
+        if date_label != None:
+            date_label.pack_forget()
+        # 日付と曜日を表示するラベルを作成
+        date_label = tk.Label(root, font=('calibri', 50, 'bold'), bg=parent_bg_color, fg='gray')
+        date_label.pack(pady=(50, 0))
+
+        # 初期化
+        if time_label != None:
+            time_label.pack_forget()
+        # 時間を表示するラベルを作成
+        time_label = tk.Label(root, font=('calibri', 120, 'bold'), bg=parent_bg_color, fg='gray')
+        # ラベルの高さを取得
+        date_label_height = date_label.winfo_height()
+        time_label.pack(pady=(date_label_height + 50, 0))  # 日付の下に配置
+
+        # # 次の更新までの待機時間を計算する関数
+        # def calculate_wait_time():
+        #     current_second = int(strftime('%S'))
+        #     return (60 - current_second) * 1000  # 次の分の最初までのミリ秒数を返す
+
+        # 日付と曜日、時間を更新する関数
+        def update_time():
+            global root_after_id_4
+            current_time = strftime('%H:%M:%S')
+            current_date = strftime('%Y-%m-%d %A', localtime())
+            time_label.config(text=current_time)
+            date_label.config(text=current_date)
+            # wait_time = calculate_wait_time() if strftime('%S') == '00' else 1000  # 次の分の最初までの待機時間を計算
+            # root_after_id_4 = root.after(wait_time, update_time)  # 次の更新まで待機
+            root_after_id_4 = root.after(1000, update_time)  # 次の更新まで待機
+
+        update_time()  # 初回の呼び出し
+    
+    if show_time:
+        set_time()
 
     # ランダムな御像を選ぶ関数
     def select_random_image():
