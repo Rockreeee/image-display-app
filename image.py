@@ -9,7 +9,11 @@ from time import strftime, localtime
 
 import start
 
-# 設定項目
+# カスタム項目
+margin_above_the_clock = 50
+time_of_brightness = 7
+time_of_darkness = 21
+
 image_directory = ""
 interval = 0 
 show_margin = False
@@ -142,7 +146,7 @@ def create_image_setting_widgets():
     tk.Checkbutton(settings_frame, variable=automatic_brightness_var).grid(row=4, column=1, sticky="w")
     
     # 時間表示のチェックボックス
-    tk.Label(settings_frame, text="Show Time").grid(row=5, column=0, sticky="w")
+    tk.Label(settings_frame, text="Show Time(Please Also Check Show Margin)").grid(row=5, column=0, sticky="w")
     tk.Checkbutton(settings_frame, variable=show_time_var).grid(row=5, column=1, sticky="w")
 
     # スタートボタン
@@ -180,7 +184,8 @@ def show_random_image():
         if label_brightness < 0:
             label_brightness = 1
         label.config(bg=f'#{int(label_brightness*255):02x}{int(label_brightness*255):02x}{int(label_brightness*255):02x}')  # 背景色を調整
-        set_time()
+        if show_time:
+            set_time()
     
     # 明るさを調整するキーバインド
     root.bind("<b>", label_brightness_adjustment)
@@ -242,45 +247,6 @@ def show_random_image():
 
         return total_seconds
 
-    # 自動明るさ調整
-    def automatic_brightness_adjustment():
-        global root_after_id_2
-        global root_after_id_3
-        global image_brightness
-        global label_brightness
-
-        # 朝、夜までの時間計算
-        time_to_morning = calculate_time_next_trigger(7, 0)
-        time_to_night = calculate_time_next_trigger(21, 0)
-
-        # すでに夜の時
-        if time_to_night < 0 or time_to_morning > 0:
-            print("今は夜です")
-            image_brightness = 0.2
-            label_brightness = 0
-            label.config(bg=f'#{int(label_brightness*255):02x}{int(label_brightness*255):02x}{int(label_brightness*255):02x}')  # 背景色を調整
-        else:
-            print("今は昼です")
-            image_brightness = 1.0
-            label_brightness = 1.0
-            label.config(bg=f'#{int(label_brightness*255):02x}{int(label_brightness*255):02x}{int(label_brightness*255):02x}')  # 背景色を調整
-
-        if time_to_morning < 0:
-            time_to_morning += 86400
-
-        if time_to_night < 0:
-            time_to_night += 86400
-
-        # 予約
-        print("画面が明るくなるまで：", int(time_to_morning))
-        print("画面が暗くなるまで：", int(time_to_night))
-        root_after_id_2 = root.after(int(time_to_morning) * 1000, automatic_brightness_adjustment)
-        root_after_id_3 = root.after(int(time_to_night) * 1000, automatic_brightness_adjustment)
-
-
-    if automatic_brightness:
-        automatic_brightness_adjustment()
-
     # 時計表示
     def set_time():
         global date_label
@@ -298,7 +264,7 @@ def show_random_image():
             date_label.pack_forget()
         # 日付と曜日を表示するラベルを作成
         date_label = tk.Label(root, font=('calibri', 50, 'bold'), bg=parent_bg_color, fg='gray')
-        date_label.pack(pady=(50, 0))
+        date_label.pack(pady=(margin_above_the_clock, 0))
 
         # 初期化
         if time_label != None:
@@ -307,7 +273,7 @@ def show_random_image():
         time_label = tk.Label(root, font=('calibri', 120, 'bold'), bg=parent_bg_color, fg='gray')
         # ラベルの高さを取得
         date_label_height = date_label.winfo_height()
-        time_label.pack(pady=(date_label_height + 50, 0))  # 日付の下に配置
+        time_label.pack(pady=(date_label_height + margin_above_the_clock, 0))  # 日付の下に配置
 
         # 日付と曜日、時間を更新する関数
         def update_time():
@@ -319,6 +285,49 @@ def show_random_image():
             root_after_id_4 = root.after(1000, update_time)  # 次の更新まで待機
 
         update_time()  # 初回の呼び出し
+
+    # 自動明るさ調整
+    def automatic_brightness_adjustment():
+        global root_after_id_2
+        global root_after_id_3
+        global image_brightness
+        global label_brightness
+
+        # 朝、夜までの時間計算
+        time_to_morning = calculate_time_next_trigger(time_of_brightness, 0)
+        time_to_night = calculate_time_next_trigger(time_of_darkness, 0)
+
+        # すでに夜の時
+        if time_to_night < 0 or time_to_morning > 0:
+            print("今は夜です")
+            image_brightness = 0.2
+            label_brightness = 0
+            label.config(bg=f'#{int(label_brightness*255):02x}{int(label_brightness*255):02x}{int(label_brightness*255):02x}')  # 背景色を調整
+            if show_time:
+                set_time()
+        else:
+            print("今は昼です")
+            image_brightness = 1.0
+            label_brightness = 1.0
+            label.config(bg=f'#{int(label_brightness*255):02x}{int(label_brightness*255):02x}{int(label_brightness*255):02x}')  # 背景色を調整
+            if show_time:
+                set_time()
+
+        if time_to_morning < 0:
+            time_to_morning += 86400
+
+        if time_to_night < 0:
+            time_to_night += 86400
+
+        # 予約
+        print("画面が明るくなるまで：", int(time_to_morning))
+        print("画面が暗くなるまで：", int(time_to_night))
+        root_after_id_2 = root.after(int(time_to_morning) * 1000, automatic_brightness_adjustment)
+        root_after_id_3 = root.after(int(time_to_night) * 1000, automatic_brightness_adjustment)
+
+
+    if automatic_brightness:
+        automatic_brightness_adjustment()
     
     if show_time:
         set_time()
@@ -338,10 +347,16 @@ def show_random_image():
     def show_image_with_margin():
         global image_brightness
 
+        clock_height = 0
+        if show_time:
+            date_label_height = date_label.winfo_height()
+            time_label_height = time_label.winfo_height()
+            clock_height = margin_above_the_clock + date_label_height + time_label_height
+
         img = Image.open(image_path)
         img_width, img_height = img.size
         screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
+        screen_height = root.winfo_screenheight() - clock_height
         constant_margin = 200
         
         if img_width > screen_width or img_height > screen_height:
