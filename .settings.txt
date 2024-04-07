@@ -1,7 +1,8 @@
 Image
 /Users/morimotoakihito/Desktop/image app/image
 60
-False
+True
+True
 True
 True
 

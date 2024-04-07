@@ -8,17 +8,20 @@ import datetime
 from time import strftime, localtime
 
 import start
+import fetch_weather
 
 # カスタム項目
 margin_above_the_clock = 50
 time_of_brightness = 7
 time_of_darkness = 21
 
+
 image_directory = ""
 interval = 0 
 show_margin = False
 automatic_brightness = False
 show_time = False
+show_weather = False
 
 root_after_id_1 = ""
 root_after_id_2 = ""
@@ -31,10 +34,12 @@ image_brightness = 1.0
 
 date_label = None
 time_label = None
+weather_label = None
 
 def cancel_root_after(root):
     global date_label
     global time_label
+    global weather_label
 
     root.after_cancel(root_after_id_1)
 
@@ -49,6 +54,7 @@ def cancel_root_after(root):
 
     date_label = None
     time_label = None
+    weather_label = None
 
 def create_image_setting_widgets():
     """開始画面を生成する関数"""
@@ -61,6 +67,7 @@ def create_image_setting_widgets():
     show_margin = start.load_settings(column=3)
     automatic_brightness = start.load_settings(column=4)
     show_time = start.load_settings(column=5)
+    show_weather = start.load_settings(column=6)
     
     # デフォルトの表示間隔を設定
     interval_var = tk.StringVar()
@@ -81,6 +88,10 @@ def create_image_setting_widgets():
     # 時間表示のON/OFF状態を保持する変数
     show_time_var = tk.BooleanVar()
     show_time_var.set(show_time)
+    
+    # 天気表示のON/OFF状態を保持する変数
+    show_weather_var = tk.BooleanVar()
+    show_weather_var.set(show_weather)
 
     # ファイル選択ダイアログを表示する関数
     def select_path():
@@ -95,17 +106,20 @@ def create_image_setting_widgets():
         global show_margin
         global automatic_brightness
         global show_time
+        global show_weather
         
         image_directory = path_var.get()
         interval = int(interval_var.get())
         show_margin = show_margin_var.get()
         automatic_brightness = automatic_brightness_var.get()
         show_time = show_time_var.get()
+        show_weather = show_weather_var.get()
 
         # 設定を保存
         start.save_settings(image_directory=image_directory, 
         image_interval=str(interval), show_margin=show_margin, 
-        automatic_brightness=automatic_brightness, show_time=show_time)
+        automatic_brightness=automatic_brightness, show_time=show_time,
+        show_weather=show_weather)
 
         root_start.destroy()
 
@@ -148,10 +162,14 @@ def create_image_setting_widgets():
     # 時間表示のチェックボックス
     tk.Label(settings_frame, text="Show Time(Please Also Check Show Margin)").grid(row=5, column=0, sticky="w")
     tk.Checkbutton(settings_frame, variable=show_time_var).grid(row=5, column=1, sticky="w")
+    
+    # 天気表示のチェックボックス
+    tk.Label(settings_frame, text="Show Weather(Please Also Check Show Margin)").grid(row=6, column=0, sticky="w")
+    tk.Checkbutton(settings_frame, variable=show_weather_var).grid(row=6, column=1, sticky="w")
 
     # スタートボタン
     start_button = tk.Button(settings_frame, text="Start", command=start_action)
-    start_button.grid(row=6, columnspan=3, pady=10, sticky="nsew")
+    start_button.grid(row=7, columnspan=3, pady=10, sticky="nsew")
     
     # スペース
     image_label = tk.Label(root_start)
@@ -185,7 +203,9 @@ def show_random_image():
             label_brightness = 1
         label.config(bg=f'#{int(label_brightness*255):02x}{int(label_brightness*255):02x}{int(label_brightness*255):02x}')  # 背景色を調整
         if show_time:
-            set_time()
+            show_clock_widget()
+        if show_weather:
+            show_weather_widget()
     
     # 明るさを調整するキーバインド
     root.bind("<b>", label_brightness_adjustment)
@@ -248,7 +268,7 @@ def show_random_image():
         return total_seconds
 
     # 時計表示
-    def set_time():
+    def show_clock_widget():
         global date_label
         global time_label
 
@@ -286,6 +306,35 @@ def show_random_image():
 
         update_time()  # 初回の呼び出し
 
+    # 天気
+    def show_weather_widget():
+        global weather_label
+
+        clock_height = 0
+
+        if show_time:
+            clock_height = margin_above_the_clock + date_label.winfo_height() + time_label.winfo_height()
+
+        # 親ウィンドウの背景色を取得
+        parent_bg_color = label.cget('bg')
+        # 日付と曜日以外の背景色を変更
+        root.configure(background=parent_bg_color)
+
+        # 初期化
+        if weather_label != None:
+            weather_label.pack_forget()
+        # 天気を表示するラベルを作成
+        weather_label = tk.Label(root, font=('calibri', 50, 'bold'), bg=parent_bg_color, fg='gray')
+        weather_label.pack(pady=(clock_height, 0))
+
+        forecast_data = fetch_weather.get_precipitation_forecast()
+        weather_label.config(text=forecast_data["weather"] 
+                            + "      " + forecast_data["high_temperature_value"] + "°" + " " + forecast_data["low_temperature_value"] + "°" + "\n" 
+                            + "00~06" + ":" + forecast_data["probabilities"][0] + "%" + " " 
+                            + "06~12" + ":" + forecast_data["probabilities"][1] + "%" + " " + "\n"
+                            + "12~18" + ":" + forecast_data["probabilities"][2] + "%" + " " 
+                            + "18~24" + ":" + forecast_data["probabilities"][3] + "%" + " ")
+
     # 自動明るさ調整
     def automatic_brightness_adjustment():
         global root_after_id_2
@@ -304,14 +353,18 @@ def show_random_image():
             label_brightness = 0
             label.config(bg=f'#{int(label_brightness*255):02x}{int(label_brightness*255):02x}{int(label_brightness*255):02x}')  # 背景色を調整
             if show_time:
-                set_time()
+                show_clock_widget()
+            if show_weather:
+                show_weather_widget()
         else:
             print("今は昼です")
             image_brightness = 1.0
             label_brightness = 1.0
             label.config(bg=f'#{int(label_brightness*255):02x}{int(label_brightness*255):02x}{int(label_brightness*255):02x}')  # 背景色を調整
             if show_time:
-                set_time()
+                show_clock_widget()
+            if show_weather:
+                show_weather_widget()
 
         if time_to_morning < 0:
             time_to_morning += 86400
@@ -330,7 +383,10 @@ def show_random_image():
         automatic_brightness_adjustment()
     
     if show_time:
-        set_time()
+        show_clock_widget()
+
+    if show_weather:
+        show_weather_widget()
 
     # ランダムな御像を選ぶ関数
     def select_random_image():
@@ -353,10 +409,14 @@ def show_random_image():
             time_label_height = time_label.winfo_height()
             clock_height = margin_above_the_clock + date_label_height + time_label_height
 
+        weather_height = 0
+        if show_weather:
+            weather_height = weather_label.winfo_height()
+
         img = Image.open(image_path)
         img_width, img_height = img.size
         screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight() - clock_height
+        screen_height = root.winfo_screenheight() - clock_height - weather_height
         constant_margin = 200
         
         if img_width > screen_width or img_height > screen_height:

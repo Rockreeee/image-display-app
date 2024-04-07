@@ -1,14 +1,25 @@
 import tkinter as tk
 
+def change_text_color(label):
+    text = label['text']
+    words = text.split()
+    label.config(text="")  # ラベルのテキストをクリア
+
+    for word in words:
+        if word == "red":
+            label.config(text=label["text"] + word + " ", fg="red")
+        elif word == "green":
+            label.config(text=label["text"] + word + " ", fg="green")
+        elif word == "blue":
+            label.config(text=label["text"] + word + " ", fg="blue")
+        else:
+            label.config(text=label["text"] + word + " ")
+
 root = tk.Tk()
-root.title("Transparent Label Example")
-root.config(background='')
 
-# 親ウィンドウの背景色を設定
-parent_bg_color = root.cget('bg')
-
-# ラベルの背景色を親の背景色と同じに設定し、文字色を設定
-label = tk.Label(root, text="This is a transparent label", bg=parent_bg_color, fg="black")
+label = tk.Label(root, text="red green blue")
 label.pack()
+
+change_text_color(label)
 
 root.mainloop()

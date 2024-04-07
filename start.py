@@ -60,12 +60,12 @@ def load_settings(column = int):
                 except IndexError:
                     return False
             
-            # video_directory
+            # weather
             if column == 6:
                 try:
                     return lines[6].strip()
                 except IndexError:
-                    return ""
+                    return False
             
             # video_interval
             if column == 7:
@@ -74,24 +74,31 @@ def load_settings(column = int):
                 except IndexError:
                     return "60"
             
-            # study_directory
+            # video_interval
             if column == 8:
                 try:
                     return lines[8].strip()
                 except IndexError:
-                    return ""
+                    return "60"
             
-            # study_answer_interval
+            # study_directory
             if column == 9:
                 try:
                     return lines[9].strip()
                 except IndexError:
-                    return "2"
+                    return ""
             
-            # study_change_interval
+            # study_answer_interval
             if column == 10:
                 try:
                     return lines[10].strip()
+                except IndexError:
+                    return "2"
+            
+            # study_change_interval
+            if column == 11:
+                try:
+                    return lines[11].strip()
                 except IndexError:
                     return "5"
 
@@ -110,19 +117,22 @@ def load_settings(column = int):
         if column == 5:
             return False
         if column == 6:
-            return ""
+            return False
         if column == 7:
-            return "60"
-        if column == 8:
             return ""
+        if column == 8:
+            return "60"
         if column == 9:
-            return "2"
+            return ""
         if column == 10:
+            return "2"
+        if column == 11:
             return "5"
 
 def save_settings(mode=None, image_directory=None,
                 image_interval=None, show_margin=None, 
                 automatic_brightness=None, show_time=None, 
+                show_weather=None, 
                 video_directory=None, video_interval=None,
                 study_file=None, study_answer_interval=None, 
                 study_change_interval=None):
@@ -145,20 +155,23 @@ def save_settings(mode=None, image_directory=None,
     if show_time == None:
         show_time = load_settings(column=5)
 
+    if show_weather == None:
+        show_weather = load_settings(column=6)
+
     if video_directory == None:
-        video_directory = load_settings(column=6)
+        video_directory = load_settings(column=7)
 
     if video_interval == None:
-        video_interval = load_settings(column=7)
+        video_interval = load_settings(column=8)
 
     if study_file == None:
-        study_file = load_settings(column=8)
+        study_file = load_settings(column=9)
 
     if study_answer_interval == None:
-        study_answer_interval = load_settings(column=9)
+        study_answer_interval = load_settings(column=10)
 
     if study_change_interval == None:
-        study_change_interval = load_settings(column=10)
+        study_change_interval = load_settings(column=11)
 
     with open(SETTINGS_FILE, "w") as f:
         # 書き込む
@@ -168,6 +181,7 @@ def save_settings(mode=None, image_directory=None,
         f.write(str(show_margin) + "\n")
         f.write(str(automatic_brightness) + "\n")
         f.write(str(show_time) + "\n")
+        f.write(str(show_weather) + "\n")
         f.write(video_directory + "\n")
         f.write(video_interval + "\n")
         f.write(study_file + "\n")

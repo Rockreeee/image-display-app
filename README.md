@@ -2,6 +2,8 @@
 
 ## Features
 ![Alt text](1.jpg)
+![Alt text](<スクリーンショット 2024-04-07 18.54.15.png>) 
+![Alt text](<スクリーンショット 2024-04-07 18.52.33.png>)
 
 ## Requirement
 
@@ -23,6 +25,12 @@ opencvインストール方法
 pip install opencv-python
 ```
 
+beautifulsoup4インストール方法
+
+```zsh
+pip install beautifulsoup4
+```
+
 ## Usage
 
 
@@ -37,6 +45,8 @@ python start.py
 - Display Interval: 画像が切り替わるまでの時間
 - Show Margin: 余白を表示するか否か
 - Automatic Brightness: 明るさを自動調整するか否か（21:00に暗くなり、07:00に明るくなる）
+- Show Clock: 時間を表示するか否か（Show Marginもonにする必要があります）
+- Show Weather:天気を表示するか否か（Show Marginもonにする必要があります）(Net環境必要)
 
 - \<Escape key>: 終了する
 - \<Space key>: 次の画像に移動する
