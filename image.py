@@ -27,6 +27,7 @@ root_after_id_1 = ""
 root_after_id_2 = ""
 root_after_id_3 = ""
 root_after_id_4 = ""
+root_after_id_5 = ""
 label_brightness = 1.0
 
 image_path = ""
@@ -51,6 +52,9 @@ def cancel_root_after(root):
 
     if root_after_id_4 != "":
         root.after_cancel(root_after_id_4)
+
+    if root_after_id_5 != "":
+        root.after_cancel(root_after_id_5)
 
     date_label = None
     time_label = None
@@ -160,7 +164,7 @@ def create_image_setting_widgets():
     tk.Checkbutton(settings_frame, variable=automatic_brightness_var).grid(row=4, column=1, sticky="w")
     
     # 時間表示のチェックボックス
-    tk.Label(settings_frame, text="Show Time(Please Also Check Show Margin)").grid(row=5, column=0, sticky="w")
+    tk.Label(settings_frame, text="Show Clock(Please Also Check Show Margin)").grid(row=5, column=0, sticky="w")
     tk.Checkbutton(settings_frame, variable=show_time_var).grid(row=5, column=1, sticky="w")
     
     # 天気表示のチェックボックス
@@ -282,15 +286,19 @@ def show_random_image():
         # 初期化
         if date_label != None:
             date_label.pack_forget()
+        # font size
+        date_font_size = root.winfo_screenwidth() // 20
         # 日付と曜日を表示するラベルを作成
-        date_label = tk.Label(root, font=('calibri', 50, 'bold'), bg=parent_bg_color, fg='gray')
+        date_label = tk.Label(root, font=('calibri', date_font_size, 'bold'), bg=parent_bg_color, fg='gray')
         date_label.pack(pady=(margin_above_the_clock, 0))
 
         # 初期化
         if time_label != None:
             time_label.pack_forget()
+        # font size
+        time_font_size = root.winfo_screenwidth() // 10
         # 時間を表示するラベルを作成
-        time_label = tk.Label(root, font=('calibri', 120, 'bold'), bg=parent_bg_color, fg='gray')
+        time_label = tk.Label(root, font=('calibri', time_font_size, 'bold'), bg=parent_bg_color, fg='gray')
         # ラベルの高さを取得
         date_label_height = date_label.winfo_height()
         time_label.pack(pady=(date_label_height + margin_above_the_clock, 0))  # 日付の下に配置
@@ -310,6 +318,10 @@ def show_random_image():
     def show_weather_widget():
         global weather_label
 
+        # 予約キャンセル
+        if root_after_id_5 !="":
+            root.after_cancel(root_after_id_5)
+
         clock_height = 0
 
         if show_time:
@@ -323,17 +335,27 @@ def show_random_image():
         # 初期化
         if weather_label != None:
             weather_label.pack_forget()
+        # font size
+        weather_font_size = root.winfo_screenwidth() // 30
         # 天気を表示するラベルを作成
-        weather_label = tk.Label(root, font=('calibri', 50, 'bold'), bg=parent_bg_color, fg='gray')
+        weather_label = tk.Label(root, font=('calibri', weather_font_size, 'bold'), bg=parent_bg_color, fg='gray')
         weather_label.pack(pady=(clock_height, 0))
 
-        forecast_data = fetch_weather.get_precipitation_forecast()
-        weather_label.config(text=forecast_data["weather"] 
-                            + "      " + forecast_data["high_temperature_value"] + "°" + " " + forecast_data["low_temperature_value"] + "°" + "\n" 
-                            + "00~06" + ":" + forecast_data["probabilities"][0] + "%" + " " 
-                            + "06~12" + ":" + forecast_data["probabilities"][1] + "%" + " " + "\n"
-                            + "12~18" + ":" + forecast_data["probabilities"][2] + "%" + " " 
-                            + "18~24" + ":" + forecast_data["probabilities"][3] + "%" + " ")
+        # １時間ごとに天気更新
+        def update_weather():
+            global root_after_id_5
+
+            forecast_data = fetch_weather.get_precipitation_forecast()
+            weather_label.config(text=forecast_data["weather"] 
+                                + "     " + "↑" + forecast_data["high_temperature_value"] + "°" + " " + "↓" +  forecast_data["low_temperature_value"] + "°" + "\n" 
+                                + "00~06" + ":" + forecast_data["probabilities"][0] + "%" + " " 
+                                + "06~12" + ":" + forecast_data["probabilities"][1] + "%" + " " + "\n"
+                                + "12~18" + ":" + forecast_data["probabilities"][2] + "%" + " " 
+                                + "18~24" + ":" + forecast_data["probabilities"][3] + "%" + " ")
+        
+            root_after_id_5 = root.after(60*1000, update_weather)  # 次の更新まで待機
+
+        update_weather()  # 初回の呼び出し
 
     # 自動明るさ調整
     def automatic_brightness_adjustment():

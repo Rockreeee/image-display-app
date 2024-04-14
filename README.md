@@ -1,9 +1,9 @@
 # Image Display App
 
 ## Features
-![Alt text](1.jpg)
-![Alt text](<スクリーンショット 2024-04-07 18.54.15.png>) 
-![Alt text](<スクリーンショット 2024-04-07 18.52.33.png>)
+![Alt text](/readme_image/1.jpg)
+![Alt text](/readme_image/2.png) 
+![Alt text](/readme_image/3.png) 
 
 ## Requirement
 
