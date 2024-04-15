@@ -7,7 +7,8 @@ from tkinter import messagebox
 from time import strftime, localtime
 import csv
 
-import start
+import load_and_save_data as ls
+import main
 
 root_after_id_1 = ""
 root_after_id_2 = ""
@@ -26,9 +27,9 @@ def create_study_setting_widgets():
     root_start.title("Study Display App")
     
     # 設定をロード
-    study_file = start.load_settings(column=7)
-    answer_interval = start.load_settings(column=8)
-    change_interval = start.load_settings(column=9)
+    study_file = ls.load_settings(column=9)
+    answer_interval = ls.load_settings(column=10)
+    change_interval = ls.load_settings(column=11)
     
     # デフォルトの表示間隔を設定
     answer_interval_var = tk.StringVar()
@@ -55,7 +56,7 @@ def create_study_setting_widgets():
         change_interval = int(change_interval_var.get())
 
         # 設定を保存
-        start.save_settings(study_file=study_file, study_answer_interval=answer_interval, study_change_interval=change_interval)
+        ls.save_settings(study_file=study_file, study_answer_interval=answer_interval, study_change_interval=change_interval)
 
         root_start.destroy()
 
@@ -69,7 +70,7 @@ def create_study_setting_widgets():
     # 戻るボタンのアクション
     def back_action():
         root_start.destroy()
-        start.create_start_widget()
+        main.create_start_widget()
 
     settings_frame = tk.Frame(root_start)
     settings_frame.grid(row=0, column=0, sticky="w")

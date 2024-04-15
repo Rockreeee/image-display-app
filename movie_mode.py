@@ -6,7 +6,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 import cv2
 
-import start
+import load_and_save_data as ls
 
 
 def create_landscape_widgets():
@@ -38,7 +38,7 @@ def create_landscape_widgets():
         interval = int(interval_var.get())
 
         # 設定を保存
-        start.save_settings(None, None, None, video_directory, str(interval))
+        ls.save_settings(None, None, None, video_directory, str(interval))
 
         root_start.destroy()
 
@@ -52,7 +52,7 @@ def create_landscape_widgets():
     # 戻るボタンのアクション
     def back_action():
         root_start.destroy()
-        start.create_start_widget()
+        ls.create_start_widget()
 
     settings_frame = tk.Frame(root_start)
     settings_frame.grid(row=0, column=0, sticky="w")

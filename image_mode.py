@@ -7,12 +7,16 @@ from tkinter import messagebox
 import datetime
 from time import strftime, localtime
 
-import start
 import fetch_weather
+import main
+import load_and_save_data as ls
 
-# カスタム項目
+# カスタム項目＝＝
+# カレンダーの上とモニターの距離
 margin_above_the_clock = 50
+# 明るくなる時間
 time_of_brightness = 7
+# 暗くなる時間
 time_of_darkness = 21
 
 
@@ -29,7 +33,6 @@ root_after_id_3 = ""
 root_after_id_4 = ""
 root_after_id_5 = ""
 label_brightness = 1.0
-
 image_path = ""
 image_brightness = 1.0
 
@@ -66,12 +69,12 @@ def create_image_setting_widgets():
     root_start.title("Image Display App")
     
     # 設定をロード
-    image_directory = start.load_settings(column=1)
-    interval = start.load_settings(column=2)
-    show_margin = start.load_settings(column=3)
-    automatic_brightness = start.load_settings(column=4)
-    show_time = start.load_settings(column=5)
-    show_weather = start.load_settings(column=6)
+    image_directory = ls.load_settings(column=1)
+    interval = ls.load_settings(column=2)
+    show_margin = ls.load_settings(column=3)
+    automatic_brightness = ls.load_settings(column=4)
+    show_time = ls.load_settings(column=5)
+    show_weather = ls.load_settings(column=6)
     
     # デフォルトの表示間隔を設定
     interval_var = tk.StringVar()
@@ -120,7 +123,7 @@ def create_image_setting_widgets():
         show_weather = show_weather_var.get()
 
         # 設定を保存
-        start.save_settings(image_directory=image_directory, 
+        ls.save_settings(image_directory=image_directory, 
         image_interval=str(interval), show_margin=show_margin, 
         automatic_brightness=automatic_brightness, show_time=show_time,
         show_weather=show_weather)
@@ -137,7 +140,7 @@ def create_image_setting_widgets():
     # 戻るボタンのアクション
     def back_action():
         root_start.destroy()
-        start.create_start_widget()
+        main.create_start_widget()
 
     settings_frame = tk.Frame(root_start)
     settings_frame.grid(row=0, column=0, sticky="w")
