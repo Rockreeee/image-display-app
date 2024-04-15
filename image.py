@@ -364,6 +364,12 @@ def show_random_image():
         global image_brightness
         global label_brightness
 
+        # 予約キャンセル
+        if root_after_id_2 !="":
+            root.after_cancel(root_after_id_2)
+        if root_after_id_3 !="":
+            root.after_cancel(root_after_id_3)
+
         # 朝、夜までの時間計算
         time_to_morning = calculate_time_next_trigger(time_of_brightness, 0)
         time_to_night = calculate_time_next_trigger(time_of_darkness, 0)
