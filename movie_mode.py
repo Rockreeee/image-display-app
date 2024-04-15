@@ -8,9 +8,9 @@ import cv2
 
 import load_and_save_data as ls
 
-
+# 開始画面を生成する関数
 def create_landscape_widgets():
-    """開始画面を生成する関数"""
+    
     root_start = tk.Tk()
     root_start.title("video Display App")
     
@@ -80,9 +80,9 @@ def create_landscape_widgets():
 
     root_start.mainloop()
 
-
+# ランダムに動画を表示する関数
 def show_random_video(directory, interval):
-    """ランダムに動画を表示する関数"""
+    
     video_files = [f for f in os.listdir(directory) if f.endswith(('.mp4', '.MOV', '.gif'))]
     root = tk.Tk()
     root.title("Video Display App")

@@ -4,6 +4,7 @@ import image_mode
 import study_mode
 import load_and_save_data as ls
 
+# 開始画面表示
 def create_start_widget():
     # 新しいウィンドウを作成
     mode_window = tk.Tk()
@@ -61,5 +62,6 @@ def create_start_widget():
 
 
 if __name__ == "__main__":
+    
     create_start_widget()
 

@@ -15,14 +15,15 @@ root_after_id_2 = ""
 root_after_id_3 = ""
 brightness = 1.0
 
+# 予約処理のキャンセル
 def cancel_root_after(root):
     root.after_cancel(root_after_id_1)
     root.after_cancel(root_after_id_2)
     root.after_cancel(root_after_id_3)
 
-
+# 開始画面を生成する関数
 def create_study_setting_widgets():
-    """開始画面を生成する関数"""
+    
     root_start = tk.Tk()
     root_start.title("Study Display App")
     
@@ -133,9 +134,8 @@ def create_time_study_widget(file, answer_interval, change_interval):
     create_study_widget(root, file, answer_interval, change_interval)
     # show_image(root)
 
-
+# 時間を上半分に表示する関数
 def create_time_widget(root):
-    """時間を上半分に表示する関数"""
 
     # ウィンドウの幅と高さを取得
     screen_width = root.winfo_screenwidth()
@@ -173,8 +173,8 @@ def create_time_widget(root):
     # ウィンドウの幅と高さを設定
     root.geometry(f"{screen_width}x{half_screen_height}+0+0")
 
+# 英語と翻訳を下半分に表示する関数
 def create_study_widget(root, file, answer_interval, change_interval):
-    """英語と翻訳を下半分に表示する関数"""
 
     # ラベルの初期フォントサイズ
     study_font_size = 50
@@ -205,8 +205,9 @@ def create_study_widget(root, file, answer_interval, change_interval):
         study_label.config(fg=study_font_color)  # フォントの色と背景色を変更
         translation_label.config(fg=translation_font_color)  # フォントの色と背景色を変更
 
+    # 英語と翻訳の更新を行う関数
     def update_text():
-        """英語と翻訳の更新を行う関数"""
+        
         global root_after_id_2
 
         adjust_font_color('white')
@@ -216,8 +217,9 @@ def create_study_widget(root, file, answer_interval, change_interval):
         translation_label.config(text="")
         root_after_id_2 = root.after(answer_interval * 1000, lambda: update_translation(random_data))
 
+    # 翻訳の更新を行う関数
     def update_translation(random_data):
-        """翻訳の更新を行う関数"""
+        
         global root_after_id_3
 
         translation_label.config(text=random_data[1])
@@ -248,15 +250,16 @@ def create_study_widget(root, file, answer_interval, change_interval):
 
     root.bind("<Configure>", adjust_font_size)
 
-def show_image(root):
-    image = "/Users/morimotoakihito/Desktop/image app/paintings/fime.jpg"
-    img = Image.open(image)
-    img_width, img_height = img.size
-    screen_width = root.winfo_screenwidth()
-    screen_height = root.winfo_screenheight()
+# def show_image(root):
+
+#     image = "/Users/morimotoakihito/Desktop/image app/paintings/fime.jpg"
+#     img = Image.open(image)
+#     img_width, img_height = img.size
+#     screen_width = root.winfo_screenwidth()
+#     screen_height = root.winfo_screenheight()
     
-    photo = ImageTk.PhotoImage(img)
-    label = tk.Label(root)
-    label.configure(image=photo)
-    label.image = photo
-    label.pack(fill=tk.BOTH, expand=True)
+#     photo = ImageTk.PhotoImage(img)
+#     label = tk.Label(root)
+#     label.configure(image=photo)
+#     label.image = photo
+#     label.pack(fill=tk.BOTH, expand=True)

@@ -2,8 +2,9 @@ import os
 
 SETTINGS_FILE = ".settings.txt"
 
+# 設定ファイルから設定を読み込む関数
 def load_settings(column = int):
-    """設定ファイルから設定を読み込む関数"""
+
     if os.path.exists(SETTINGS_FILE):
         with open(SETTINGS_FILE, "r") as f:
             lines = f.readlines()
@@ -119,6 +120,7 @@ def load_settings(column = int):
         if column == 11:
             return "5"
 
+# 設定を設定ファイルに保存する関数
 def save_settings(mode=None, image_directory=None,
                 image_interval=None, show_margin=None, 
                 automatic_brightness=None, show_time=None, 
@@ -126,7 +128,7 @@ def save_settings(mode=None, image_directory=None,
                 video_directory=None, video_interval=None,
                 study_file=None, study_answer_interval=None, 
                 study_change_interval=None):
-    """設定を設定ファイルに保存する関数"""
+    
     if mode == None:
         mode = load_settings(column=0)
 

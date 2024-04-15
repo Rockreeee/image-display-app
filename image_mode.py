@@ -19,7 +19,6 @@ time_of_brightness = 7
 # 暗くなる時間
 time_of_darkness = 21
 
-
 image_directory = ""
 interval = 0 
 show_margin = False
@@ -40,6 +39,7 @@ date_label = None
 time_label = None
 weather_label = None
 
+# 予約処理のキャンセル
 def cancel_root_after(root):
     global date_label
     global time_label
@@ -63,6 +63,7 @@ def cancel_root_after(root):
     time_label = None
     weather_label = None
 
+# image_modeの設定
 def create_image_setting_widgets():
     """開始画面を生成する関数"""
     root_start = tk.Tk()
@@ -184,13 +185,12 @@ def create_image_setting_widgets():
 
     root_start.mainloop()
 
-
+# ランダムに画像を表示する関数
 def show_random_image():
-    """ランダムに画像を表示する関数"""
+
     image_files = [f for f in os.listdir(image_directory) if f.endswith(('.jpg', '.jpeg', '.png'))]
     root = tk.Tk()
     root.title("Image Display App")
-    
 
     # 終了する時の関数
     def close_window(event):
@@ -200,7 +200,6 @@ def show_random_image():
     
     # 終了する時のキーバインド
     root.bind("<Escape>", close_window)
-
 
     # 明るさを調整する関数
     def label_brightness_adjustment(event):
@@ -216,7 +215,6 @@ def show_random_image():
     
     # 明るさを調整するキーバインド
     root.bind("<b>", label_brightness_adjustment)
-
 
     # 明るさを調整する関数
     def image_brightness_adjustment(event):
@@ -255,7 +253,6 @@ def show_random_image():
 
     # キーイベントをバインドしてカーソルを表示きりかえ
     root.bind("<h>", toggle_cursor)
-    
 
     label = tk.Label(root, bg='white')
     label.pack(fill=tk.BOTH, expand=True, side="bottom")
@@ -495,7 +492,6 @@ def show_random_image():
         root_after_id_1 = root.after(interval * 1000, show_next_image)
 
     show_next_image()
-
 
     # 次のイメージにする関数
     def next_image(event):
