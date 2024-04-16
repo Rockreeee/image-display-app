@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 def get_precipitation_forecast():
 
     try:
-
         # 気象情報サイトのURL
         url = f"https://tenki.jp/forecast/5/26/5110/23211/"
 
@@ -31,7 +30,6 @@ def get_precipitation_forecast():
             else:
                 weather_text = "--"
 
-
             # classがhigh-temp tempのdd要素を取得
             temperature_dd = soup.find('dd', class_='high-temp temp')
 
@@ -45,7 +43,6 @@ def get_precipitation_forecast():
             else:
                 print("要素が見つかりませんでした")
 
-
             # classがlow-temp tempのdd要素を取得
             temperature_dd = soup.find('dd', class_='low-temp temp')
 
@@ -58,7 +55,6 @@ def get_precipitation_forecast():
                     low_temperature_value = "--"
             else:
                 print("要素が見つかりませんでした")
-
 
             # classがrain-probabilityのtr要素を取得
             rain_probability_tr = soup.find('tr', class_='rain-probability')
@@ -82,6 +78,7 @@ def get_precipitation_forecast():
                 "low_temperature_value": low_temperature_value,
                 "probabilities": probabilities
             }
+        
     except requests.exceptions.RequestException as e:
         # リクエストが失敗した場合の処理
         print("天気取得でエラーが発生しました:")
@@ -93,8 +90,6 @@ def get_precipitation_forecast():
             "probabilities": ["--", "--", "--", "--"]
         }
     
-
-
     else:
         return "サーバーからデータを取得できませんでした。"
 
