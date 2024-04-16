@@ -187,6 +187,8 @@ def create_time_widget(root):
     # 日付と曜日、時間を更新する関数
     def update_time():
         global root_after_id_1
+        if root_after_id_1 != "":
+            root.after_cancel(root_after_id_1)
 
         current_time = strftime('%H:%M:%S')
         current_date = strftime('%Y-%m-%d %A', localtime())
@@ -239,6 +241,8 @@ def create_study_widget(root, file, answer_interval, change_interval):
     # 英語と翻訳の更新を行う関数
     def update_text():
         global root_after_id_2
+        if root_after_id_2 != "":
+            root.after_cancel(root_after_id_2)
 
         adjust_font_color('white')
         nonlocal random_data  # ローカル変数ではなく外部の変数を参照するためにnonlocalを使用
@@ -249,8 +253,9 @@ def create_study_widget(root, file, answer_interval, change_interval):
 
     # 翻訳の更新を行う関数
     def update_translation(random_data):
-        
         global root_after_id_3
+        if root_after_id_3 != "":
+            root.after_cancel(root_after_id_3)
 
         translation_label.config(text=random_data[1])
         root_after_id_3 = root.after(change_interval * 1000, update_text)

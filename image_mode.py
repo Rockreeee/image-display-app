@@ -275,6 +275,7 @@ def show_random_image():
     def show_clock_widget():
         global date_label
         global time_label
+        global root_after_id_4
 
         # 予約キャンセル
         if root_after_id_4 !="":
@@ -306,6 +307,10 @@ def show_random_image():
         # 日付と曜日、時間を更新する関数
         def update_time():
             global root_after_id_4
+            # 予約キャンセル
+            if root_after_id_4 !="":
+                root.after_cancel(root_after_id_4)
+                
             current_time = strftime('%H:%M:%S')
             current_date = strftime('%Y-%m-%d %A', localtime())
             time_label.config(text=current_time)
@@ -317,10 +322,6 @@ def show_random_image():
     # 天気
     def show_weather_widget():
         global weather_label
-
-        # 予約キャンセル
-        if root_after_id_5 !="":
-            root.after_cancel(root_after_id_5)
 
         clock_height = 0
 
@@ -345,6 +346,10 @@ def show_random_image():
         def update_weather():
             global root_after_id_5
 
+            # 予約キャンセル
+            if root_after_id_5 !="":
+                root.after_cancel(root_after_id_5)
+
             forecast_data = fetch_weather.get_precipitation_forecast()
             weather_label.config(text=forecast_data["weather"] 
                                 + "     " + "↑" + forecast_data["high_temperature_value"] + "°" + " " + "↓" +  forecast_data["low_temperature_value"] + "°" + "\n" 
@@ -352,8 +357,8 @@ def show_random_image():
                                 + "06~12" + ":" + forecast_data["probabilities"][1] + "%" + " " + "\n"
                                 + "12~18" + ":" + forecast_data["probabilities"][2] + "%" + " " 
                                 + "18~24" + ":" + forecast_data["probabilities"][3] + "%" + " ")
-        
-            root_after_id_5 = root.after(60*1000, update_weather)  # 次の更新まで待機
+
+            root_after_id_5 = root.after(1000, update_weather)  # 次の更新まで待機
 
         update_weather()  # 初回の呼び出し
 
@@ -488,6 +493,8 @@ def show_random_image():
 
     def show_next_image():
         global root_after_id_1
+        if root_after_id_1 != "":
+            root.after_cancel(root_after_id_1)
         select_random_image()
         root_after_id_1 = root.after(interval * 1000, show_next_image)
 
