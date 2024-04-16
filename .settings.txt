@@ -1,4 +1,4 @@
-Study
+Image
 /Users/morimotoakihito/Desktop/image app/image
 60
 True
@@ -8,5 +8,5 @@ True
 
 60
 /Users/morimotoakihito/Desktop/image app/data.csv
-2
-5
+4
+3

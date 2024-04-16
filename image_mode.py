@@ -241,7 +241,7 @@ def show_random_image():
     root.bind("<f>", toggle_fullscreen)
 
 
-    # ウィンドウの大きさを調整
+    # カーソルを隠す関数
     def toggle_cursor(event=None):
         cursor_state = root.cget("cursor")
         print(cursor_state)

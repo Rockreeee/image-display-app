@@ -107,7 +107,6 @@ def create_study_setting_widgets():
 def create_time_study_widget(file, answer_interval, change_interval):
     root = tk.Tk()
     root.title("Study App")
-    root.attributes("-fullscreen", True)
     root.configure(background='black')
     
     # 終了する時の関数
@@ -130,6 +129,26 @@ def create_time_study_widget(file, answer_interval, change_interval):
     # 明るさを調整するキーバインド
     root.bind("<b>", brightness_adjustment)
 
+    # ウィンドウの大きさを調整
+    def toggle_fullscreen(event=None):
+        root.attributes("-fullscreen", not root.attributes("-fullscreen"))
+
+    # キーイベントをバインドしてフルスクリーン表示の切り替えを有効にする
+    root.bind("<f>", toggle_fullscreen)
+
+    # カーソルを隠す関数
+    def toggle_cursor(event=None):
+        cursor_state = root.cget("cursor")
+        print(cursor_state)
+
+        if cursor_state == "none":
+            root.config(cursor="arrow") 
+        else:
+            root.config(cursor="none")  # "none"はカーソルを非表示にする
+
+    # キーイベントをバインドしてカーソルを表示きりかえ
+    root.bind("<h>", toggle_cursor)
+
     create_time_widget(root)
     create_study_widget(root, file, answer_interval, change_interval)
     # show_image(root)
@@ -144,13 +163,21 @@ def create_time_widget(root):
     # 上半分の高さを計算
     half_screen_height = screen_height // 2
 
+    # font size
+    date_font_size = root.winfo_screenwidth() // 20
+    time_font_size = root.winfo_screenwidth() // 8
+
     # 日付と曜日を表示するラベルを作成
-    date_label = tk.Label(root, font=('calibri', 50, 'bold'), bg='black', fg='white')
-    date_label.pack(anchor='nw', padx=100, pady=50)
+    date_label = tk.Label(root, font=('calibri', date_font_size, 'bold'), bg='black', fg='white')
+    screen_height = root.winfo_screenheight()
+    top_to_label = screen_height * 0.2
+    date_label.pack(pady=(top_to_label, 0))
 
     # 時間を表示するラベルを作成
-    time_label = tk.Label(root, font=('calibri', 200, 'bold'), bg='black', fg='white')
-    time_label.pack(anchor='n')
+    time_label = tk.Label(root, font=('calibri', time_font_size, 'bold'), bg='black', fg='white')
+    screen_height = root.winfo_screenheight()
+    top_to_label = screen_height * 0.05
+    time_label.pack(pady=(top_to_label, 0))
 
     # 次の更新までの待機時間を計算する関数
     def calculate_wait_time():
@@ -177,17 +204,21 @@ def create_time_widget(root):
 def create_study_widget(root, file, answer_interval, change_interval):
 
     # ラベルの初期フォントサイズ
-    study_font_size = 50
-    translation_font_size = 30
+    study_font_size = root.winfo_screenwidth() // 15
+    translation_font_size = root.winfo_screenwidth() // 15
     study_font_color = 'white'
     translation_font_color = 'white'
 
     study_label = tk.Label(root, text="", font=('calibri', study_font_size), bg='black', fg=study_font_color)
-    study_label.pack(pady=50)
+    screen_height = root.winfo_screenheight()
+    top_to_label = screen_height * 0.05
+    study_label.pack(pady=(top_to_label, 0))
 
     translation_label = tk.Label(root, text="", font=('calibri', translation_font_size), bg='black', fg=translation_font_color)
-    translation_label.pack()
-
+    screen_height = root.winfo_screenheight()
+    top_to_label = screen_height * 0.05
+    translation_label.pack(pady=(top_to_label, 0))
+    
     # 
     data = []
     random_data = ""
@@ -207,7 +238,6 @@ def create_study_widget(root, file, answer_interval, change_interval):
 
     # 英語と翻訳の更新を行う関数
     def update_text():
-        
         global root_after_id_2
 
         adjust_font_color('white')
@@ -228,16 +258,6 @@ def create_study_widget(root, file, answer_interval, change_interval):
     # 初回の呼び出し
     update_text()
 
-    # ウィンドウサイズが変更されたときにフォントサイズを調整する
-    def adjust_font_size(event):
-        nonlocal study_font_size, translation_font_size
-        # ウィンドウのサイズに合わせてフォントサイズを調整
-        study_font_size = max(10, int(root.winfo_width() / 8))
-        translation_font_size = max(10, int(root.winfo_width() / 10))
-        study_label.config(font=('calibri', study_font_size))
-        translation_label.config(font=('calibri', translation_font_size))
-
-
     # 暗記機能
     def got_it(event):
         try:
@@ -248,18 +268,13 @@ def create_study_widget(root, file, answer_interval, change_interval):
         
     root.bind("<space>", got_it)
 
+    # ウィンドウサイズが変更されたときにフォントサイズを調整する
+    def adjust_font_size(event):
+        nonlocal study_font_size, translation_font_size
+        # ウィンドウのサイズに合わせてフォントサイズを調整
+        study_font_size = max(10, int(root.winfo_width() / 8))
+        translation_font_size = max(10, int(root.winfo_width() / 10))
+        study_label.config(font=('calibri', study_font_size))
+        translation_label.config(font=('calibri', translation_font_size))
+
     root.bind("<Configure>", adjust_font_size)
-
-# def show_image(root):
-
-#     image = "/Users/morimotoakihito/Desktop/image app/paintings/fime.jpg"
-#     img = Image.open(image)
-#     img_width, img_height = img.size
-#     screen_width = root.winfo_screenwidth()
-#     screen_height = root.winfo_screenheight()
-    
-#     photo = ImageTk.PhotoImage(img)
-#     label = tk.Label(root)
-#     label.configure(image=photo)
-#     label.image = photo
-#     label.pack(fill=tk.BOTH, expand=True)

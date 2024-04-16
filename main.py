@@ -10,8 +10,16 @@ def create_start_widget():
     mode_window = tk.Tk()
     mode_window.title("Select Mode")
 
+    # 画面の幅と高さを取得
+    screen_width = mode_window.winfo_screenwidth()
+    screen_height = mode_window.winfo_screenheight()
+
     # ウィンドウの幅と高さを指定
-    mode_window.geometry("200x200") 
+    window_width = 200
+    window_height = 200
+    x = (screen_width - window_width) // 2
+    y = (screen_height - window_height) // 2
+    mode_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
     # ラベルを作成
     label = tk.Label(mode_window, text="Select Mode:")
