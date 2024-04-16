@@ -358,7 +358,7 @@ def show_random_image():
                                 + "12~18" + ":" + forecast_data["probabilities"][2] + "%" + " " 
                                 + "18~24" + ":" + forecast_data["probabilities"][3] + "%" + " ")
 
-            root_after_id_5 = root.after(1000, update_weather)  # 次の更新まで待機
+            root_after_id_5 = root.after(60 * 1000, update_weather)  # 次の更新まで待機
 
         update_weather()  # 初回の呼び出し
 
@@ -480,12 +480,19 @@ def show_random_image():
         new_width = int(img_width * ratio)
         new_height = int(img_height * ratio)
         img = img.resize((new_width, new_height), Image.ANTIALIAS)
-        
+
+        # 画像の中央部分を切り取るための座標を計算
+        x = (new_width - screen_width) // 2
+        y = (new_height - screen_height) // 2
+
+        # 画像が画面より大きい場合は切り取る
+        if x > 0 or y > 0:
+            img = img.crop((x, y, x + screen_width, y + screen_height))
+
         # 明るさを調整するためのBrightnessオブジェクトを作成し、ファクターを設定
         enhancer = ImageEnhance.Brightness(img)
         adjusted_image = enhancer.enhance(image_brightness)
 
-        # 画像を表示するラベルを作成し、中央に配置する
         photo = ImageTk.PhotoImage(adjusted_image)
         label.configure(image=photo)
         label.image = photo

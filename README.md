@@ -1,4 +1,8 @@
 # Image Display App
+- 思い出の写真を飾る
+- 好きなアーティストの絵画をランダムで飾る
+- 時間を確かめる
+- 毎日の天気、降水確率を見る
 
 ## Features
 ![Alt text](/readme_image/1.jpg)
