@@ -1,7 +1,7 @@
 import tkinter as tk
 
-import image_mode
-import study_mode
+import image_mode.image_mode as image_mode
+import study_mode.study_mode as study_mode
 import load_and_save_data as ls
 
 # 開始画面表示

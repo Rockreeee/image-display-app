@@ -8,18 +8,23 @@ import datetime
 from time import strftime, localtime
 import threading
 
-import fetch_weather
-import music_player
+import image_mode.fetch_weather as fetch_weather
+import image_mode.music_player as music_player
 import main
 import load_and_save_data as ls
 
-# カスタム項目＝＝
+# カスタム項目＝＝===========
+
 # カレンダーの上とモニターの距離
 margin_above_the_clock = 50
 # 明るくなる時間
 time_of_brightness = 7
 # 暗くなる時間
 time_of_darkness = 21
+# 音楽が止まるまでの時間（分）
+time_to_stop_music = 30
+
+# カスタム項目＝＝===========
 
 image_directory = ""
 interval = 0 
@@ -44,6 +49,7 @@ image_brightness = 1.0
 date_label = None
 time_label = None
 weather_label = None
+
 
 # 予約処理のキャンセル
 def cancel_root_after(root):
@@ -74,6 +80,7 @@ def cancel_root_after(root):
     date_label = None
     time_label = None
     weather_label = None
+
 
 # image_modeの設定
 def create_image_setting_widgets():
@@ -225,6 +232,7 @@ def create_image_setting_widgets():
 
     root_start.mainloop()
 
+
 # ランダムに画像を表示する関数
 def show_random_image():
 
@@ -276,9 +284,9 @@ def show_random_image():
         else:
             show_image_without_margin()
 
+
     # 明るさを調整するキーバインド
     root.bind("<v>", image_brightness_adjustment)
-
 
     # ウィンドウの大きさを調整
     def toggle_fullscreen(event=None):
@@ -478,8 +486,8 @@ def show_random_image():
             music_thread = threading.Thread(target=player.play_music_loop)
             music_thread.start()
 
-            # 初回起動時以外は音楽を停止予約 30分後
-            root_after_id_7 = root.after(int(30 * 60) * 1000, player.stop_music)
+            # 初回起動時以外は音楽を停止予約
+            root_after_id_7 = root.after(int(time_to_stop_music * 60) * 1000, player.stop_music)
 
 
         # 朝までの時間計算
