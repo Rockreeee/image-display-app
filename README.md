@@ -41,7 +41,7 @@ pip install beautifulsoup4
 ```zsh
 git clone https://github.com/hoge/~
 cd ~
-python start.py
+python main.py
 ```
 
 # Image mode

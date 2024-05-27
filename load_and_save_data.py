@@ -28,7 +28,7 @@ def load_settings(column = int):
                 try:
                     return lines[2].strip()
                 except IndexError:
-                    return "60"
+                    return "3600"
             
             # margin
             if column == 3:

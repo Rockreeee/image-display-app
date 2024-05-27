@@ -200,6 +200,7 @@ def show_random_image():
     
     # 終了する時のキーバインド
     root.bind("<Escape>", close_window)
+    root.bind("<q>", close_window)
 
     # 明るさを調整する関数
     def label_brightness_adjustment(event):

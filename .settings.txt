@@ -1,10 +1,10 @@
 Image
 /Users/morimotoakihito/Desktop/image app/image
-60
-False
-False
-False
-False
+6
+True
+True
+True
+True
 
 60
 /Users/morimotoakihito/Desktop/image app/data.csv

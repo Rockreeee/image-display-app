@@ -5,7 +5,7 @@ def get_precipitation_forecast():
 
     try:
         # 気象情報サイトのURL
-        url = f"https://tenki.jp/forecast/5/26/5110/23211/"
+        url = f"https://tenki.jp/forecast/5/26/5110/23230/"
 
         # HTTPリクエストを送信してページのHTMLを取得
         response = requests.get(url)
