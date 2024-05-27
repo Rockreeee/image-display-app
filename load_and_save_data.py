@@ -58,6 +58,20 @@ def load_settings(column = int):
                 except IndexError:
                     return False
             
+            # image_directory
+            if column == 7:
+                try:
+                    return lines[7].strip()
+                except IndexError:
+                    return ""
+            
+            # morning_sound_mode
+            if column == 8:
+                try:
+                    return lines[8].strip()
+                except IndexError:
+                    return False
+            
             # video_interval
             if column == 10:
                 try:
@@ -109,6 +123,10 @@ def load_settings(column = int):
             return False
         if column == 6:
             return False
+        if column == 7:
+            return ""
+        if column == 8:
+            return False
         if column == 10:
             return ""
         if column == 11:
@@ -128,6 +146,8 @@ def save_settings(mode=None,
                 automatic_brightness=None, 
                 show_time=None, 
                 show_weather=None, 
+                sound_file=None,
+                morning_sound_mode=None,
                 video_directory=None, 
                 video_interval=None,
                 study_file=None, 
@@ -155,6 +175,12 @@ def save_settings(mode=None,
     if show_weather == None:
         show_weather = load_settings(column=6)
 
+    if sound_file == None:
+        sound_file = load_settings(column=7)
+
+    if morning_sound_mode == None:
+        morning_sound_mode = load_settings(column=8)
+
     if video_directory == None:
         video_directory = load_settings(column=10)
 
@@ -179,8 +205,8 @@ def save_settings(mode=None,
         f.write(str(automatic_brightness) + "\n")
         f.write(str(show_time) + "\n")
         f.write(str(show_weather) + "\n")
-        f.write("\n")
-        f.write("\n")
+        f.write(sound_file + "\n")
+        f.write(str(morning_sound_mode) + "\n")
         f.write("\n")
         f.write(video_directory + "\n")
         f.write(video_interval + "\n")

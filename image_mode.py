@@ -6,8 +6,10 @@ from tkinter import filedialog
 from tkinter import messagebox
 import datetime
 from time import strftime, localtime
+import threading
 
 import fetch_weather
+import music_player
 import main
 import load_and_save_data as ls
 
@@ -25,12 +27,16 @@ show_margin = False
 automatic_brightness = False
 show_time = False
 show_weather = False
+player = None
+music_thread = None
 
 root_after_id_1 = ""
 root_after_id_2 = ""
 root_after_id_3 = ""
 root_after_id_4 = ""
 root_after_id_5 = ""
+root_after_id_6 = ""
+root_after_id_7 = ""
 label_brightness = 1.0
 image_path = ""
 image_brightness = 1.0
@@ -59,6 +65,12 @@ def cancel_root_after(root):
     if root_after_id_5 != "":
         root.after_cancel(root_after_id_5)
 
+    if root_after_id_6 != "":
+        root.after_cancel(root_after_id_6)
+
+    if root_after_id_7 != "":
+        root.after_cancel(root_after_id_7)
+
     date_label = None
     time_label = None
     weather_label = None
@@ -76,6 +88,8 @@ def create_image_setting_widgets():
     automatic_brightness = ls.load_settings(column=4)
     show_time = ls.load_settings(column=5)
     show_weather = ls.load_settings(column=6)
+    sound_file = ls.load_settings(column=7)
+    morning_sound_mode = ls.load_settings(column=8)
     
     # デフォルトの表示間隔を設定
     interval_var = tk.StringVar()
@@ -100,6 +114,14 @@ def create_image_setting_widgets():
     # 天気表示のON/OFF状態を保持する変数
     show_weather_var = tk.BooleanVar()
     show_weather_var.set(show_weather)
+    
+    # 音ファイルパスを保持する変数
+    sound_file_var = tk.StringVar()
+    sound_file_var.set(sound_file)
+    
+    # 音を流すのを朝だけにする状態を保持する変数
+    morning_sound_mode_var = tk.BooleanVar()
+    morning_sound_mode_var.set(morning_sound_mode)
 
     # ファイル選択ダイアログを表示する関数
     def select_path():
@@ -115,6 +137,8 @@ def create_image_setting_widgets():
         global automatic_brightness
         global show_time
         global show_weather
+        global sound_file
+        global morning_sound_mode
         
         image_directory = path_var.get()
         interval = int(interval_var.get())
@@ -122,12 +146,19 @@ def create_image_setting_widgets():
         automatic_brightness = automatic_brightness_var.get()
         show_time = show_time_var.get()
         show_weather = show_weather_var.get()
+        sound_file = sound_file_var.get()
+        morning_sound_mode = morning_sound_mode_var.get()
 
         # 設定を保存
-        ls.save_settings(image_directory=image_directory, 
-        image_interval=str(interval), show_margin=show_margin, 
-        automatic_brightness=automatic_brightness, show_time=show_time,
-        show_weather=show_weather)
+        ls.save_settings(
+            image_directory=image_directory, 
+            image_interval=str(interval), 
+            show_margin=show_margin, 
+            automatic_brightness=automatic_brightness, 
+            show_time=show_time,
+            show_weather=show_weather,
+            sound_file=sound_file,
+            morning_sound_mode=morning_sound_mode)
 
         root_start.destroy()
 
@@ -175,9 +206,18 @@ def create_image_setting_widgets():
     tk.Label(settings_frame, text="Show Weather(Please Also Check Show Margin)").grid(row=6, column=0, sticky="w")
     tk.Checkbutton(settings_frame, variable=show_weather_var).grid(row=6, column=1, sticky="w")
 
+    # 音ファイル場所
+    tk.Label(settings_frame, text="Sound File:").grid(row=7, column=0, sticky="w")
+    tk.Entry(settings_frame, textvariable=sound_file_var).grid(row=7, column=1, sticky="w")
+    tk.Button(settings_frame, text="Browse", command=select_path).grid(row=7, column=2, sticky="w")
+    
+    # 朝のみに音楽を流す時のチェックボックス
+    tk.Label(settings_frame, text="morning sound only").grid(row=8, column=0, sticky="w")
+    tk.Checkbutton(settings_frame, variable=morning_sound_mode_var).grid(row=8, column=1, sticky="w")
+
     # スタートボタン
     start_button = tk.Button(settings_frame, text="Start", command=start_action)
-    start_button.grid(row=7, columnspan=3, pady=10, sticky="nsew")
+    start_button.grid(row=9, columnspan=3, pady=10, sticky="nsew")
     
     # スペース
     image_label = tk.Label(root_start)
@@ -194,6 +234,12 @@ def show_random_image():
 
     # 終了する時の関数
     def close_window(event):
+        global player
+        
+        # 音楽停止
+        if player != None:
+            player.stop_music()
+
         cancel_root_after(root)
         root.destroy()
         create_image_setting_widgets()
@@ -412,6 +458,40 @@ def show_random_image():
         root_after_id_2 = root.after(int(time_to_morning) * 1000, automatic_brightness_adjustment)
         root_after_id_3 = root.after(int(time_to_night) * 1000, automatic_brightness_adjustment)
 
+    # 自動音予約
+    def automatic_sound_booking():
+        global root_after_id_6
+        global root_after_id_7
+        global player
+        global music_thread
+
+        # 予約キャンセル
+        if root_after_id_6 != "":
+            root.after_cancel(root_after_id_6)
+
+        if root_after_id_7 != "":
+            root.after_cancel(root_after_id_7)
+
+            # 初回起動時以外は音楽を再生
+            player = music_player.MusicPlayer(sound_file)
+            # play_music_loopを別スレッドで実行
+            music_thread = threading.Thread(target=player.play_music_loop)
+            music_thread.start()
+
+            # 初回起動時以外は音楽を停止予約 30分後
+            root_after_id_7 = root.after(int(30 * 60) * 1000, player.stop_music)
+
+
+        # 朝までの時間計算
+        time_to_morning = calculate_time_next_trigger(time_of_brightness, 0)
+
+        if time_to_morning < 0:
+            time_to_morning += 86400
+
+        # 予約
+        print("朝音が流れるまで：", int(time_to_morning))
+        root_after_id_6 = root.after(int(time_to_morning) * 1000, automatic_sound_booking)
+
 
     if automatic_brightness:
         automatic_brightness_adjustment()
@@ -421,6 +501,20 @@ def show_random_image():
 
     if show_weather:
         show_weather_widget()
+
+    if sound_file != "":
+        if morning_sound_mode:
+            automatic_sound_booking()
+        else:
+            global player
+            global music_thread
+
+            player = music_player.MusicPlayer(sound_file)
+
+            # play_music_loopを別スレッドで実行
+            music_thread = threading.Thread(target=player.play_music_loop)
+            music_thread.start()
+        
 
     # ランダムな御像を選ぶ関数
     def select_random_image():
