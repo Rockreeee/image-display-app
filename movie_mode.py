@@ -15,8 +15,8 @@ def create_landscape_widgets():
     root_start.title("video Display App")
     
     # 設定をロード
-    video_directory = start.load_settings(column=3)
-    interval = start.load_settings(column=4)
+    video_directory = ls.load_settings(column=10)
+    interval = ls.load_settings(column=11)
     
     # デフォルトの表示間隔を設定
     interval_var = tk.StringVar()

@@ -28,9 +28,9 @@ def create_study_setting_widgets():
     root_start.title("Study Display App")
     
     # 設定をロード
-    study_file = ls.load_settings(column=9)
-    answer_interval = ls.load_settings(column=10)
-    change_interval = ls.load_settings(column=11)
+    study_file = ls.load_settings(column=20)
+    answer_interval = ls.load_settings(column=21)
+    change_interval = ls.load_settings(column=22)
     
     # デフォルトの表示間隔を設定
     answer_interval_var = tk.StringVar()
