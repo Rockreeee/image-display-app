@@ -5,9 +5,9 @@ True
 True
 True
 True
-
+/Users/morimotoakihito/Desktop/image app/sound
+True
 False
-
 
 60
 
