@@ -34,6 +34,12 @@ show_time = False
 show_weather = False
 player = None
 music_thread = None
+label_brightness = 1.0
+image_path = ""
+image_brightness = 1.0
+date_label = None
+time_label = None
+weather_label = None
 
 root_after_id_1 = ""
 root_after_id_2 = ""
@@ -42,13 +48,6 @@ root_after_id_4 = ""
 root_after_id_5 = ""
 root_after_id_6 = ""
 root_after_id_7 = ""
-label_brightness = 1.0
-image_path = ""
-image_brightness = 1.0
-
-date_label = None
-time_label = None
-weather_label = None
 
 
 # 開始画面を生成する関数
@@ -448,14 +447,14 @@ def create_image_widgets():
         root_after_id_3 = root.after(int(time_to_night) * 1000, automatic_brightness_adjustment)
 
     # 音楽再生
-    def play_sound(random_play_sound):
+    def play_sound(path):
         global player
         global music_thread
 
-        player = music_player.MusicPlayer(random_play_sound)
+        player = music_player.MusicPlayer(path)
 
         # play_music_loopを別スレッドで実行
-        music_thread = threading.Thread(target=player.play_music_loop)
+        music_thread = threading.Thread(target=player.play_music)
         music_thread.start()
 
     # 自動音予約
@@ -472,12 +471,10 @@ def create_image_widgets():
         if root_after_id_7 != "":
             root.after_cancel(root_after_id_7)
 
-            random_sound_file = select_random_sound_file(sound_file)
-
             # 初回起動時以外は音楽を再生
-            player = music_player.MusicPlayer(random_sound_file)
+            player = music_player.MusicPlayer(sound_file)
             # play_music_loopを別スレッドで実行
-            music_thread = threading.Thread(target=player.play_music_loop)
+            music_thread = threading.Thread(target=player.play_music)
             music_thread.start()
 
             # 初回起動時以外は音楽を停止予約
@@ -506,8 +503,7 @@ def create_image_widgets():
 
     if sound_file != "":
         if sound_mode:
-            random_sound_file = select_random_sound_file(sound_file)
-            play_sound(random_sound_file)
+            play_sound(sound_file)
         elif morning_sound_mode:
             automatic_sound_booking()
         
@@ -637,13 +633,3 @@ def cancel_root_after(root):
     date_label = None
     time_label = None
     weather_label = None
-
-
-# パス内のファイルの中からランダムで一つ選択して返す関数(.mp3)
-def select_random_sound_file(path):
-
-    file = [f for f in os.listdir(path) if f.endswith('.mp3')]
-    random_file = random.choice(file)
-    random_file_path = os.path.join(path, random_file)
-
-    return random_file_path
