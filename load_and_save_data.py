@@ -16,7 +16,7 @@ def load_settings(column = int):
                 except IndexError:
                     return "Image"
             
-            # image_directory
+            # image_path
             if column == 1:
                 try:
                     return lines[1].strip()
@@ -58,7 +58,7 @@ def load_settings(column = int):
                 except IndexError:
                     return False
             
-            # sound_directory
+            # sound_path
             if column == 7:
                 try:
                     return lines[7].strip()
@@ -93,7 +93,7 @@ def load_settings(column = int):
                 except IndexError:
                     return "60"
             
-            # study_directory
+            # study_path
             if column == 20:
                 try:
                     return lines[20].strip()
@@ -149,13 +149,13 @@ def load_settings(column = int):
 
 # 設定を設定ファイルに保存する関数
 def save_settings(mode=None, 
-                image_directory=None,
+                image_path=None,
                 image_interval=None, 
                 show_margin=None, 
                 automatic_brightness=None, 
                 show_time=None, 
                 show_weather=None, 
-                sound_file=None,
+                sound_path=None,
                 sound_mode=None,
                 morning_sound_mode=None,
                 video_directory=None, 
@@ -167,8 +167,8 @@ def save_settings(mode=None,
     if mode == None:
         mode = load_settings(column=0)
 
-    if image_directory == None:
-        image_directory = load_settings(column=1)
+    if image_path == None:
+        image_path = load_settings(column=1)
 
     if image_interval == None:
         image_interval = load_settings(column=2)
@@ -185,8 +185,8 @@ def save_settings(mode=None,
     if show_weather == None:
         show_weather = load_settings(column=6)
 
-    if sound_file == None:
-        sound_file = load_settings(column=7)
+    if sound_path == None:
+        sound_path = load_settings(column=7)
 
     if sound_mode == None:
         sound_mode = load_settings(column=8)
@@ -212,13 +212,13 @@ def save_settings(mode=None,
     with open(SETTINGS_FILE, "w") as f:
         # 書き込む
         f.write(mode + "\n")
-        f.write(image_directory + "\n")
+        f.write(image_path + "\n")
         f.write(image_interval + "\n")
         f.write(str(show_margin) + "\n")
         f.write(str(automatic_brightness) + "\n")
         f.write(str(show_time) + "\n")
         f.write(str(show_weather) + "\n")
-        f.write(sound_file + "\n")
+        f.write(sound_path + "\n")
         f.write(str(sound_mode) + "\n")
         f.write(str(morning_sound_mode) + "\n")
         f.write(video_directory + "\n")

@@ -71,8 +71,8 @@ def create_image_setting_widgets():
     interval_var.set(interval)
     
     # 前回選択したファイルパスを設定
-    path_var = tk.StringVar()
-    path_var.set(image_directory)
+    image_path_var = tk.StringVar()
+    image_path_var.set(image_directory)
     
     # 余白表示のON/OFF状態を保持する変数
     show_margin_var = tk.BooleanVar()
@@ -91,8 +91,8 @@ def create_image_setting_widgets():
     show_weather_var.set(show_weather)
     
     # 音ファイルパスを保持する変数
-    sound_file_var = tk.StringVar()
-    sound_file_var.set(sound_file)
+    sound_path_var = tk.StringVar()
+    sound_path_var.set(sound_file)
     
     # 音を流すかを保持する変数
     sound_mode_var = tk.BooleanVar()
@@ -102,11 +102,17 @@ def create_image_setting_widgets():
     morning_sound_mode_var = tk.BooleanVar()
     morning_sound_mode_var.set(morning_sound_mode)
 
-    # ファイル選択ダイアログを表示する関数
-    def select_path():
+    # 画像ファイル選択ダイアログを表示する関数
+    def select_image_path():
         path = filedialog.askdirectory()
         if path:
-            path_var.set(path)
+            image_path_var.set(path)
+
+    # ファイル選択ダイアログを表示する関数
+    def select_sound_path():
+        path = filedialog.askdirectory()
+        if path:
+            sound_path_var.set(path)
 
     # 開始ボタンのアクション
     def start_action():
@@ -120,25 +126,25 @@ def create_image_setting_widgets():
         global sound_mode
         global morning_sound_mode
         
-        image_directory = path_var.get()
+        image_directory = image_path_var.get()
         interval = int(interval_var.get())
         show_margin = show_margin_var.get()
         automatic_brightness = automatic_brightness_var.get()
         show_time = show_time_var.get()
         show_weather = show_weather_var.get()
-        sound_file = sound_file_var.get()
+        sound_file = sound_path_var.get()
         sound_mode = sound_mode_var.get()
         morning_sound_mode = morning_sound_mode_var.get()
 
         # 設定を保存
         ls.save_settings(
-            image_directory=image_directory, 
+            image_path=image_directory, 
             image_interval=str(interval), 
             show_margin=show_margin, 
             automatic_brightness=automatic_brightness, 
             show_time=show_time,
             show_weather=show_weather,
-            sound_file=sound_file,
+            sound_path=sound_file,
             sound_mode=sound_mode,
             morning_sound_mode=morning_sound_mode)
 
@@ -165,8 +171,8 @@ def create_image_setting_widgets():
 
     # ファイル場所
     tk.Label(settings_frame, text="Image Directory:").grid(row=1, column=0, sticky="w")
-    tk.Entry(settings_frame, textvariable=path_var).grid(row=1, column=1, sticky="w")
-    tk.Button(settings_frame, text="Browse", command=select_path).grid(row=1, column=2, sticky="w")
+    tk.Entry(settings_frame, textvariable=image_path_var).grid(row=1, column=1, sticky="w")
+    tk.Button(settings_frame, text="Browse", command=select_image_path).grid(row=1, column=2, sticky="w")
 
     # 切り替え間隔
     tk.Label(settings_frame, text="Display Interval (seconds):").grid(row=2, column=0, sticky="w")
@@ -190,8 +196,8 @@ def create_image_setting_widgets():
 
     # 音ファイル場所
     tk.Label(settings_frame, text="Sound File:").grid(row=7, column=0, sticky="w")
-    tk.Entry(settings_frame, textvariable=sound_file_var).grid(row=7, column=1, sticky="w")
-    tk.Button(settings_frame, text="Browse", command=select_path).grid(row=7, column=2, sticky="w")
+    tk.Entry(settings_frame, textvariable=sound_path_var).grid(row=7, column=1, sticky="w")
+    tk.Button(settings_frame, text="Browse", command=select_sound_path).grid(row=7, column=2, sticky="w")
     
     # 朝のみに音楽を流す時のチェックボックス
     tk.Label(settings_frame, text="sound on/off").grid(row=8, column=0, sticky="w")
@@ -210,6 +216,7 @@ def create_image_setting_widgets():
     image_label.grid(row=1, column=0)
 
     root_start.mainloop()
+
 
 
 # ランダムに画像を表示する関数
@@ -287,6 +294,16 @@ def create_image_widgets():
 
     # キーイベントをバインドしてカーソルを表示きりかえ
     root.bind("<h>", toggle_cursor)
+
+
+    # ミュートにする関数
+    def sound_mute(event=None):
+        if player != None:
+            player.sound_mute()
+
+    # キーイベントをバインドしてミュートの切り替えを有効にする
+    root.bind("<m>", sound_mute)
+
 
     label = tk.Label(root, bg='white')
     label.pack(fill=tk.BOTH, expand=True, side="bottom")
@@ -464,21 +481,22 @@ def create_image_widgets():
         global player
         global music_thread
 
-        # 予約キャンセル
-        if root_after_id_6 != "":
-            root.after_cancel(root_after_id_6)
-
         if root_after_id_7 != "":
             root.after_cancel(root_after_id_7)
 
-            # 初回起動時以外は音楽を再生
+        # root_after_id_6に値がある=初回起動時ではない
+        if root_after_id_6 != "":
+            # 音楽を再生
             player = music_player.MusicPlayer(sound_file)
-            # play_music_loopを別スレッドで実行
             music_thread = threading.Thread(target=player.play_music)
             music_thread.start()
 
             # 初回起動時以外は音楽を停止予約
             root_after_id_7 = root.after(int(time_to_stop_music * 60) * 1000, player.stop_music)
+
+        # 予約キャンセル
+        if root_after_id_6 != "":
+            root.after_cancel(root_after_id_6)
 
 
         # 朝までの時間計算
