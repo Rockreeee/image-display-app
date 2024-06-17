@@ -1,6 +1,6 @@
 Image
 /Users/morimotoakihito/Desktop/image app/image
-3600
+5
 True
 True
 True

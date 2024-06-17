@@ -56,8 +56,8 @@ def create_start_widget():
         ls.save_settings(mode=selected_mode)
         
         if selected_mode == "Image":
-            # image_mode_setting.create_image_setting_widgets()
-            image_mode.create_image_setting_widgets()
+            image_mode_setting.create_image_setting_widgets()
+            # image_mode.create_image_setting_widgets()
         # elif selected_mode == "Movie":
         #     movie.create_movie_setting_widgets()
         elif selected_mode == "Study":
