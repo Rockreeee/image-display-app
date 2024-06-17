@@ -1,6 +1,5 @@
 import tkinter as tk
 
-import image_mode.image_mode as image_mode
 import image_mode.image_mode_setting as image_mode_setting
 import study_mode.study_mode as study_mode
 import load_and_save_data as ls
@@ -57,7 +56,6 @@ def create_start_widget():
         
         if selected_mode == "Image":
             image_mode_setting.create_image_setting_widgets()
-            # image_mode.create_image_setting_widgets()
         # elif selected_mode == "Movie":
         #     movie.create_movie_setting_widgets()
         elif selected_mode == "Study":

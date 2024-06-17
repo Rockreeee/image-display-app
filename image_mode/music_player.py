@@ -4,6 +4,7 @@ import os
 import random
 
 class MusicPlayer:
+    
     def __init__(self, mp3_Path):
         self.mp3_Path = mp3_Path
         # ミュート状態を保持するための変数
