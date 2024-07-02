@@ -5,9 +5,9 @@ True
 True
 True
 True
-/Users/morimotoakihito/Desktop/image app/sound
-True
+/Users/morimotoakihito/Desktop/image app/sound/ジブリ
 False
+True
 
 60
 

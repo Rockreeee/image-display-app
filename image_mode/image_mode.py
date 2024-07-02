@@ -17,12 +17,14 @@ import load_and_save_data as ls
 
 # カレンダーの上とモニターの距離
 margin_above_the_clock = 50
-# 明るくなる時間
-time_of_brightness = 7
-# 暗くなる時間
+# 明るくなる時間、分
+time_of_brightness = 22
+time_of_brightness_minutes = 52
+# 暗くなる時間、分
 time_of_darkness = 21
+time_of_darkness_minutes = 0
 # 音楽が止まるまでの時間（分）
-time_to_stop_music = 30
+time_to_stop_music_minutes = 1
 
 # カスタム項目＝＝===========
 
@@ -46,6 +48,7 @@ image_brightness = 1.0
 date_label = None
 time_label = None
 weather_label = None
+volume = 1.0
 
 root_after_id_1 = ""
 root_after_id_2 = ""
@@ -100,13 +103,16 @@ def create_image_widgets():
     root.bind("<b>", label_brightness_adjustment)
 
     # 明るさを調整するキーバインド
-    root.bind("<v>", image_brightness_adjustment)
+    root.bind("<i>", image_brightness_adjustment)
 
     # キーイベントをバインドしてフルスクリーン表示の切り替えを有効にする
     root.bind("<f>", toggle_fullscreen)
 
     # キーイベントをバインドしてカーソルを表示きりかえ
     root.bind("<h>", toggle_cursor)
+
+    # キーイベントをバインドして音量の調整を有効にする
+    root.bind("<v>", set_volume)
 
     # キーイベントをバインドしてミュートの切り替えを有効にする
     root.bind("<m>", sound_mute)
@@ -217,6 +223,17 @@ def toggle_cursor(event):
 def sound_mute(event):
     if player != None:
         player.sound_mute()
+
+# 音量を調整する関数
+def set_volume(event):
+    global volume
+    if volume >= 0.1:
+        volume -= 0.2
+    else:
+        volume = 1.0
+    print("音量を" + str(volume) + "に変更しました")
+    player.set_volume(volume)
+
 
 # 次のイメージにする関数
 def next_image(event):
@@ -345,8 +362,8 @@ def automatic_brightness_adjustment():
         root.after_cancel(root_after_id_3)
 
     # 朝、夜までの時間計算
-    time_to_morning = calculate_time_next_trigger(time_of_brightness, 0)
-    time_to_night = calculate_time_next_trigger(time_of_darkness, 0)
+    time_to_morning = calculate_time_next_trigger(time_of_brightness, time_of_brightness_minutes)
+    time_to_night = calculate_time_next_trigger(time_of_darkness, time_of_darkness_minutes)
 
     # すでに夜の時
     if time_to_night < 0 or time_to_morning > 0:
@@ -368,10 +385,10 @@ def automatic_brightness_adjustment():
         if show_weather:
             show_weather_widget()
 
-    if time_to_morning < 0:
+    if time_to_morning < 1:
         time_to_morning += 86400
 
-    if time_to_night < 0:
+    if time_to_night < 1:
         time_to_night += 86400
 
     # 予約
@@ -409,17 +426,15 @@ def automatic_sound_booking():
         music_thread.start()
 
         # 初回起動時以外は音楽を停止予約
-        root_after_id_7 = root.after(int(time_to_stop_music * 60) * 1000, player.stop_music)
+        root_after_id_7 = root.after(int(time_to_stop_music_minutes * 60) * 1000, player.stop_music)
 
-    # 予約キャンセル
-    if root_after_id_6 != "":
+        # 予約キャンセル
         root.after_cancel(root_after_id_6)
 
-
     # 朝までの時間計算
-    time_to_morning = calculate_time_next_trigger(time_of_brightness, 0)
+    time_to_morning = calculate_time_next_trigger(time_of_brightness, time_of_brightness_minutes)
 
-    if time_to_morning < 0:
+    if time_to_morning < 1:
         time_to_morning += 86400
 
     # 予約

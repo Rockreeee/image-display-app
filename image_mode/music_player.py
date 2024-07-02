@@ -49,3 +49,7 @@ class MusicPlayer:
         else:
             pygame.mixer.music.set_volume(1)
             print("ミュートを解除しました")
+    
+    # 音量調整関数
+    def set_volume(self, volume):
+        pygame.mixer.music.set_volume(volume)
