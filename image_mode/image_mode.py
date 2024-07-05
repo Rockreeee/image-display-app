@@ -18,13 +18,13 @@ import load_and_save_data as ls
 # カレンダーの上とモニターの距離
 margin_above_the_clock = 50
 # 明るくなる時間、分
-time_of_brightness = 22
-time_of_brightness_minutes = 52
+time_of_brightness = 21
+time_of_brightness_minutes = 34
 # 暗くなる時間、分
 time_of_darkness = 21
-time_of_darkness_minutes = 0
+time_of_darkness_minutes = 33
 # 音楽が止まるまでの時間（分）
-time_to_stop_music_minutes = 1
+time_to_stop_music_minutes = 30
 
 # カスタム項目＝＝===========
 
@@ -365,9 +365,15 @@ def automatic_brightness_adjustment():
     time_to_morning = calculate_time_next_trigger(time_of_brightness, time_of_brightness_minutes)
     time_to_night = calculate_time_next_trigger(time_of_darkness, time_of_darkness_minutes)
 
+    if time_to_morning < 1:
+        time_to_morning += 86400
+
+    if time_to_night < 1:
+        time_to_night += 86400
+
     # すでに夜の時
-    if time_to_night < 0 or time_to_morning > 0:
-        print("今は夜です")
+    if time_to_morning < time_to_night:
+        print("今は夜です、暗くします")
         image_brightness = 0.2
         label_brightness = 0
         label.config(bg=f'#{int(label_brightness*255):02x}{int(label_brightness*255):02x}{int(label_brightness*255):02x}')  # 背景色を調整
@@ -376,7 +382,7 @@ def automatic_brightness_adjustment():
         if show_weather:
             show_weather_widget()
     else:
-        print("今は昼です")
+        print("今は昼です、明るくします")
         image_brightness = 1.0
         label_brightness = 1.0
         label.config(bg=f'#{int(label_brightness*255):02x}{int(label_brightness*255):02x}{int(label_brightness*255):02x}')  # 背景色を調整
@@ -385,15 +391,7 @@ def automatic_brightness_adjustment():
         if show_weather:
             show_weather_widget()
 
-    if time_to_morning < 1:
-        time_to_morning += 86400
-
-    if time_to_night < 1:
-        time_to_night += 86400
-
     # 予約
-    print("画面が明るくなるまで：", int(time_to_morning))
-    print("画面が暗くなるまで：", int(time_to_night))
     root_after_id_2 = root.after(int(time_to_morning) * 1000, automatic_brightness_adjustment)
     root_after_id_3 = root.after(int(time_to_night) * 1000, automatic_brightness_adjustment)
 
