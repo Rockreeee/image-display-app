@@ -18,13 +18,13 @@ import load_and_save_data as ls
 # カレンダーの上とモニターの距離
 margin_above_the_clock = 50
 # 明るくなる時間、分
-time_of_brightness = 21
-time_of_brightness_minutes = 34
+time_of_brightness = 7
+time_of_brightness_minutes = 0
 # 暗くなる時間、分
 time_of_darkness = 21
-time_of_darkness_minutes = 33
+time_of_darkness_minutes = 0
 # 音楽が止まるまでの時間（分）
-time_to_stop_music_minutes = 30
+time_to_stop_music_minutes = 10
 
 # カスタム項目＝＝===========
 
