@@ -13,21 +13,23 @@ import image_mode.music_player as music_player
 import image_mode.image_mode_setting as image_mode_setting
 import load_and_save_data as ls
 
-# カスタム項目＝＝===========
 
+# カスタム設定
 # カレンダーの上とモニターの距離
-margin_above_the_clock = 50
-# 明るくなる時間、分
-time_of_brightness = 7
-time_of_brightness_minutes = 0
-# 暗くなる時間、分
-time_of_darkness = 21
-time_of_darkness_minutes = 0
+MARGIN_ABOVE_CLOCK = 50
+# 明るくなる時間
+TIME_BRIGHTNESS_HOUR = 7
+# 明るくなる分
+TIME_BRIGHTNESS_MINUTE = 0
+# 暗くなる時間
+TIME_DARKNESS_HOUR = 21
+# 暗くなる分
+TIME_DARKNESS_MINUTE = 0
 # 音楽が止まるまでの時間（分）
-time_to_stop_music_minutes = 10
+MUSIC_STOP_MINUTES = 10
 
-# カスタム項目＝＝===========
 
+# グローバル変数
 image_path = None
 interval = None
 show_margin = None
@@ -277,7 +279,7 @@ def show_clock_widget():
     date_font_size = root.winfo_screenwidth() // 20
     # 日付と曜日を表示するラベルを作成
     date_label = tk.Label(root, font=('calibri', date_font_size, 'bold'), bg=parent_bg_color, fg='gray')
-    date_label.pack(pady=(margin_above_the_clock, 0))
+    date_label.pack(pady=(MARGIN_ABOVE_CLOCK, 0))
 
     # 初期化
     if time_label != None:
@@ -288,7 +290,7 @@ def show_clock_widget():
     time_label = tk.Label(root, font=('calibri', time_font_size, 'bold'), bg=parent_bg_color, fg='gray')
     # ラベルの高さを取得
     date_label_height = date_label.winfo_height()
-    time_label.pack(pady=(date_label_height + margin_above_the_clock, 0))  # 日付の下に配置
+    time_label.pack(pady=(date_label_height + MARGIN_ABOVE_CLOCK, 0))  # 日付の下に配置
 
     # 日付と曜日、時間を更新する関数
     def update_time():
@@ -312,7 +314,7 @@ def show_weather_widget():
     clock_height = 0
 
     if show_time:
-        clock_height = margin_above_the_clock + date_label.winfo_height() + time_label.winfo_height()
+        clock_height = MARGIN_ABOVE_CLOCK + date_label.winfo_height() + time_label.winfo_height()
 
     # 親ウィンドウの背景色を取得
     parent_bg_color = label.cget('bg')
@@ -362,8 +364,8 @@ def automatic_brightness_adjustment():
         root.after_cancel(root_after_id_3)
 
     # 朝、夜までの時間計算
-    time_to_morning = calculate_time_next_trigger(time_of_brightness, time_of_brightness_minutes)
-    time_to_night = calculate_time_next_trigger(time_of_darkness, time_of_darkness_minutes)
+    time_to_morning = calculate_time_next_trigger(TIME_BRIGHTNESS_HOUR, TIME_BRIGHTNESS_MINUTE)
+    time_to_night = calculate_time_next_trigger(TIME_DARKNESS_HOUR, TIME_DARKNESS_MINUTE)
 
     if time_to_morning < 1:
         time_to_morning += 86400
@@ -424,13 +426,13 @@ def automatic_sound_booking():
         music_thread.start()
 
         # 初回起動時以外は音楽を停止予約
-        root_after_id_7 = root.after(int(time_to_stop_music_minutes * 60) * 1000, player.stop_music)
+        root_after_id_7 = root.after(int(MUSIC_STOP_MINUTES * 60) * 1000, player.stop_music)
 
         # 予約キャンセル
         root.after_cancel(root_after_id_6)
 
     # 朝までの時間計算
-    time_to_morning = calculate_time_next_trigger(time_of_brightness, time_of_brightness_minutes)
+    time_to_morning = calculate_time_next_trigger(TIME_BRIGHTNESS_HOUR, TIME_BRIGHTNESS_MINUTE)
 
     if time_to_morning < 1:
         time_to_morning += 86400
@@ -452,7 +454,7 @@ def show_image_with_margin():
     if show_time:
         date_label_height = date_label.winfo_height()
         time_label_height = time_label.winfo_height()
-        clock_height = margin_above_the_clock + date_label_height + time_label_height
+        clock_height = MARGIN_ABOVE_CLOCK + date_label_height + time_label_height
 
     weather_height = 0
     if show_weather:
@@ -517,9 +519,13 @@ def show_next_image():
     if root_after_id_1 != "":
         root.after_cancel(root_after_id_1)
     if show_margin:
-        show_image_with_margin()
+        # show_image_with_marginを別スレッドで実行
+        show_image_with_margin_thread = threading.Thread(target=show_image_with_margin)
+        show_image_with_margin_thread.start()
     else:
-        show_image_without_margin()
+        # show_image_without_marginを別スレッドで実行
+        show_image_without_margin_thread = threading.Thread(target=show_image_without_margin)
+        show_image_without_margin_thread.start()
     root_after_id_1 = root.after(interval * 1000, show_next_image)
 
 def str_to_bool(s):
