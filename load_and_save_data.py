@@ -1,6 +1,6 @@
 import os
 
-SETTINGS_FILE = ".settings.txt"
+SETTINGS_FILE = ".settings"
 
 # 設定ファイルから設定を読み込む関数
 def load_settings(column = int):
