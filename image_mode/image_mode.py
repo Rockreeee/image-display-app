@@ -480,7 +480,7 @@ def show_image_with_margin():
 
     # 画像を表示するラベルに設定
     photo = ImageTk.PhotoImage(adjusted_image)
-    label.configure(image=photo)
+    root.after(0, lambda: label.configure(image=photo))
     label.image = photo
 
 def show_image_without_margin():
