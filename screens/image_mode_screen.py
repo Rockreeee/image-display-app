@@ -21,7 +21,7 @@ TIME_BRIGHTNESS_HOUR = 7
 TIME_BRIGHTNESS_MINUTE = 0
 # 暗くなる時間
 TIME_DARKNESS_HOUR = 21
-TIME_DARKNESS_MINUTE = 0
+TIME_DARKNESS_MINUTE = 6
 # 音楽が止まるまでの時間（分）
 MUSIC_STOP_MINUTES = 10
 # end: カスタム設定
@@ -345,6 +345,12 @@ class ImageModeScreen:
         # 背景色を調整
         self.update_background_color()
 
+        # 画像色を調整
+        adjusted_image = self.enhancer.enhance(self.image_brightness)
+        photo = ImageTk.PhotoImage(adjusted_image)
+        self.label.configure(image=photo)
+        self.label.image = photo
+
         # 予約
         print("明るさが変わるまで：", min(time_to_morning, time_to_night), "秒")
         self.root_after_id_brightness_adjustment = self.root.after(min(time_to_morning, time_to_night) * 1000, self.automatic_brightness_adjustment)
@@ -407,22 +413,16 @@ class ImageModeScreen:
     def cancel_root_after(self):
         if hasattr(self, 'root_after_id_time'):
             self.root.after_cancel(self.root_after_id_time)
-
         if hasattr(self, 'root_after_id_weather'):
             self.root.after_cancel(self.root_after_id_weather)
-
         if hasattr(self, 'root_after_id_image_with_margin'):
             self.root.after_cancel(self.root_after_id_image_with_margin)
-
         if hasattr(self, 'root_after_id_image_without_margin'):
             self.root.after_cancel(self.root_after_id_image_without_margin)
-
         if hasattr(self, 'root_after_id_brightness_adjustment'):
             self.root.after_cancel(self.root_after_id_brightness_adjustment)
-
         if hasattr(self, 'root_after_id_sound_stop_booking'):
             self.root.after_cancel(self.root_after_id_sound_stop_booking)
-
         if hasattr(self, 'root_after_id_sound_start_booking'):
             self.root.after_cancel(self.root_after_id_sound_start_booking)
 
