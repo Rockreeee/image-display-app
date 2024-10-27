@@ -1,7 +1,0 @@
-[Desktop Entry]
-Name=Image Display App
-Exec=/usr/bin/python /home/akito/Desktop/code/main.py
-Icon=/home/akito/Desktop/code/image/icon.jpeg
-Terminal=true
-Type=Application
-Categories=Utility;

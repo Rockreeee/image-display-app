@@ -32,7 +32,7 @@ class ImageModeSettingScreen:
         self.show_time_var = tk.BooleanVar(value=settings.get('show_time'))
         self.show_weather_var = tk.BooleanVar(value=settings.get('show_weather'))
         self.sound_path_var = tk.StringVar(value=settings.get('sound_path'))
-        self.sound_mode_var = tk.BooleanVar(value=settings.get('sound_mode'))
+        self.sound_mode_var = tk.StringVar(value=settings.get('sound_mode'))
 
     def create_widgets(self):
         settings_frame = tk.Frame(self.root)

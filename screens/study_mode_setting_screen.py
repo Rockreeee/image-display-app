@@ -34,7 +34,7 @@ class StudyModeSettingScreen:
         settings_frame.pack(padx=20, pady=10, fill="both", expand=True)
 
         # ラベル・エントリ・ボタンの設定
-        self.create_label_entry_button(settings_frame, "Study File(.csv): *", self.study_file_var, self.select_sound_file_path, row=0)
+        self.create_label_entry_button(settings_frame, "Study File(.csv): *", self.study_file_var, self.select_study_file, row=0)
         self.create_label_entry(settings_frame, "Answer Interval (seconds): *", self.answer_interval_var, row=1)
         self.create_label_entry(settings_frame, "Change Interval (seconds): *", self.change_interval_var, row=2)
 
@@ -58,9 +58,11 @@ class StudyModeSettingScreen:
         tk.Label(frame, text=text).grid(row=row, column=0, sticky="w")
         tk.Checkbutton(frame, variable=variable).grid(row=row, column=1, sticky="w")
 
-    def select_sound_file_path(self):
+    def select_study_file(self):
         """画像ファイル選択ダイアログを表示"""
-        path = filedialog.askdirectory()
+        path = filedialog.askopenfilename(
+            title="Select a sound file"
+        )
         if path:
             self.study_file_var.set(path)
 

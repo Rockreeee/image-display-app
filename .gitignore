@@ -3,3 +3,6 @@ __pycache__/
 
 # Ignore .DS_Store files
 .DS_Store
+
+# Ignore image_display_app.desktop file
+image_display_app.desktop

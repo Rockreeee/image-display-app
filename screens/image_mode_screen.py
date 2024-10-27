@@ -14,6 +14,8 @@ from PIL import Image, ImageEnhance, ImageTk
 # start: カスタム設定
 # 日付UIとディスプレイ距離
 MARGIN_ABOVE_CLOCK = 50
+# 画像の表示領域に対して何割表示するか 0~1.0
+CONSTANT_MARGIN = 0.7
 # 明るくなる時間
 TIME_BRIGHTNESS_HOUR = 7
 TIME_BRIGHTNESS_MINUTE = 0
@@ -170,7 +172,6 @@ class ImageModeScreen:
 
     # 時計のUI作成
     def show_clock_widget(self):
-
         # ラベルを作成
         date_font_size = self.root.winfo_screenwidth() // 20
         time_font_size = self.root.winfo_screenwidth() // 10
@@ -207,8 +208,8 @@ class ImageModeScreen:
         # ラベルの高さを取得して天気ラベルを配置
         clock_height = 0
         if self.show_time:
-            clock_height = MARGIN_ABOVE_CLOCK + self.date_label.winfo_height() + self.time_label.winfo_height()
-        self.weather_label.pack(pady=(clock_height, 0))
+            clock_height = self.date_label.winfo_height() + self.time_label.winfo_height()
+        self.weather_label.pack(pady=(MARGIN_ABOVE_CLOCK + clock_height, 0))
 
         # １時間ごとに天気更新
         self.update_weather()
@@ -258,14 +259,11 @@ class ImageModeScreen:
         img_width, img_height = img.size
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight() - clock_height - weather_height
-
-        # 画像の表示領域に対して何割表示するか 0~1.0
-        constant_margin = 0.5
         
         if img_width > screen_width or img_height > screen_height:
             ratio = min(screen_width / img_width, screen_height / img_height)
-            new_width = int(img_width * ratio * constant_margin)
-            new_height = int(img_height * ratio * constant_margin)
+            new_width = int(img_width * ratio * CONSTANT_MARGIN)
+            new_height = int(img_height * ratio * CONSTANT_MARGIN)
             img = img.resize((new_width, new_height), Image.LANCZOS)
         
         # 明るさを調整するためのBrightnessオブジェクトを作成し、ファクターを設定
@@ -386,7 +384,7 @@ class ImageModeScreen:
     # 自動音予約
     def automatic_sound_booking(self):
         # 初回起動時ではない時
-        if not hasattr(self, 'player'):
+        if hasattr(self, 'player'):
             # 音楽を再生
             self.player = music_player.MusicPlayer(self.sound_path)
             self.music_thread = threading.Thread(target=self.player.play_music)
@@ -401,7 +399,7 @@ class ImageModeScreen:
             time_to_morning += 86400
 
         # 予約
-        print("音が流れるまで：", int(time_to_morning))
+        print("音が流れるまで：", int(time_to_morning), "秒")
         self.root_after_id_sound_start_booking = self.root.after(int(time_to_morning) * 1000, self.automatic_sound_booking)
     
     
