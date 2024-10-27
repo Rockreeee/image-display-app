@@ -17,8 +17,17 @@
 
 ## Installation
 
-pillowインストール方法
+pythonインストール方法
+```zsh
+brew install python
+```
 
+tkinterインストール方法
+```zsh
+brew install python-tk
+```
+
+pillowインストール方法
 ```zsh
 pip install pillow
 ```
