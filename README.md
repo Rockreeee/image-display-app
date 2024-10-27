@@ -5,9 +5,10 @@
 - 毎日の天気、降水確率を見る
 
 ## Features
-![Alt text](/asset/1.jpg)
-![Alt text](/asset/2.png) 
-![Alt text](/asset/3.png) 
+
+<img src="asset/1.jpg" alt="代替テキスト" width="200" height="200" />
+<img src="asset/2.png" alt="代替テキスト" width="100" height="200" />
+<img src="asset/3.png" alt="代替テキスト" width="100" height="200" />
 
 ## Requirement
 

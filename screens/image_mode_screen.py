@@ -28,6 +28,7 @@ class ImageModeScreen:
     def __init__(self, root):
         self.root = root
         self.root.title("Image Display App")
+        self.root.configure(background='white')
         self.image_brightness = 1.0
         self.label_brightness = 1.0
         self.volume = 1.0
@@ -169,15 +170,12 @@ class ImageModeScreen:
 
     # 時計のUI作成
     def show_clock_widget(self):
-        # 親ウィンドウの背景色を取得
-        parent_bg_color = self.root.cget('bg')
-        self.root.configure(background=parent_bg_color)
 
         # ラベルを作成
         date_font_size = self.root.winfo_screenwidth() // 20
         time_font_size = self.root.winfo_screenwidth() // 10
-        self.date_label = tk.Label(self.root, font=('calibri', date_font_size, 'bold'), bg=parent_bg_color, fg='gray')
-        self.time_label = tk.Label(self.root, font=('calibri', time_font_size, 'bold'), bg=parent_bg_color, fg='gray')
+        self.date_label = tk.Label(self.root, font=('calibri', date_font_size, 'bold'), bg='white', fg='gray')
+        self.time_label = tk.Label(self.root, font=('calibri', time_font_size, 'bold'), bg='white', fg='gray')
 
         # ラベルの高さを取得して時間ラベルを配置
         self.date_label.pack(pady=(MARGIN_ABOVE_CLOCK, 0))
@@ -202,13 +200,9 @@ class ImageModeScreen:
 
     # 天気のUI作成
     def show_weather_widget(self):
-        # 親ウィンドウの背景色を取得
-        parent_bg_color = self.label.cget('bg')
-        self.root.configure(background=parent_bg_color)
-        
         # 天気を表示するラベルを作成
         weather_font_size = self.root.winfo_screenwidth() // 30
-        self.weather_label = tk.Label(self.root, font=('calibri', weather_font_size, 'bold'), bg=parent_bg_color, fg='gray')
+        self.weather_label = tk.Label(self.root, font=('calibri', weather_font_size, 'bold'), bg='white', fg='gray')
 
         # ラベルの高さを取得して天気ラベルを配置
         clock_height = 0
@@ -264,12 +258,14 @@ class ImageModeScreen:
         img_width, img_height = img.size
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight() - clock_height - weather_height
-        constant_margin = 200
+
+        # 画像の表示領域に対して何割表示するか 0~1.0
+        constant_margin = 0.5
         
         if img_width > screen_width or img_height > screen_height:
             ratio = min(screen_width / img_width, screen_height / img_height)
-            new_width = int(img_width * ratio) - constant_margin
-            new_height = int(img_height * ratio) - constant_margin
+            new_width = int(img_width * ratio * constant_margin)
+            new_height = int(img_height * ratio * constant_margin)
             img = img.resize((new_width, new_height), Image.LANCZOS)
         
         # 明るさを調整するためのBrightnessオブジェクトを作成し、ファクターを設定
