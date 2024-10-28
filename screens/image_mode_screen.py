@@ -311,7 +311,6 @@ class ImageModeScreen:
     
     def automatic_brightness_adjustment(self):
         now = datetime.now().time()
-        now = datetime.strptime("20:14", "%H:%M").time()
         
         if now >= datetime.strptime("09:00", "%H:%M").time() and now < datetime.strptime("17:00", "%H:%M").time():
             # 昼の時間帯は明るさを1.0に設定
