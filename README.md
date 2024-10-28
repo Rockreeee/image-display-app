@@ -16,7 +16,7 @@
 
 # 🖥️ システム要件
 
-* python
+* **python**
 * パッケージ:
     - **pillow** (画像処理)
     - **tkinter** (UI構築)

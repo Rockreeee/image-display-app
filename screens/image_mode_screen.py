@@ -5,7 +5,7 @@ import utils.fetch_weather as fetch_weather
 import utils.music_player as music_player
 import os
 import random
-import datetime
+from datetime import datetime, timedelta
 import threading
 from tkinter import messagebox
 from time import strftime, localtime
@@ -105,10 +105,7 @@ class ImageModeScreen:
         if self.image_brightness < 0:
             self.image_brightness = 1
         if hasattr(self, 'enhancer'):
-            adjusted_image = self.enhancer.enhance(self.image_brightness)
-            photo = ImageTk.PhotoImage(adjusted_image)
-            self.label.configure(image=photo)
-            self.label.image = photo
+            self.update_image_brightness()
 
     # ウィンドウの大きさを調整
     def toggle_fullscreen(self, event):
@@ -217,6 +214,7 @@ class ImageModeScreen:
     # 天気のUI更新
     def update_weather(self):
         # 天気データの取得
+        print("天気を更新します。")
         forecast_data = fetch_weather.get_precipitation_forecast()
         self.weather_label.config(text=forecast_data["weather"]
                                   + "     " + "↑" + forecast_data["high_temperature_value"] + "°" 
@@ -227,7 +225,7 @@ class ImageModeScreen:
                                   + "18~24" + ":" + forecast_data["probabilities"][3] + "%" + " ")
 
         # 次の更新まで待機
-        self.root_after_id_weather = self.root.after(60 * 1000, self.update_weather)
+        self.root_after_id_weather = self.root.after(3600 * 1000, self.update_weather)
 
     def next_image(self, event):
         if self.show_margin:
@@ -268,12 +266,7 @@ class ImageModeScreen:
         
         # 明るさを調整するためのBrightnessオブジェクトを作成し、ファクターを設定
         self.enhancer = ImageEnhance.Brightness(img)
-        adjusted_image = self.enhancer.enhance(self.image_brightness)
-
-        # 画像を表示するラベルに設定
-        photo = ImageTk.PhotoImage(adjusted_image)
-        self.label.configure(image=photo)
-        self.label.image = photo
+        self.update_image_brightness()
 
         # 次の更新まで待機
         self.root_after_id_image_with_margin = self.root.after(self.interval * 1000, self.update_image_with_margin_widget)
@@ -305,12 +298,7 @@ class ImageModeScreen:
 
         # 明るさを調整するためのBrightnessオブジェクトを作成し、ファクターを設定
         self.enhancer = ImageEnhance.Brightness(img)
-        adjusted_image = self.enhancer.enhance(self.image_brightness)
-
-        # 画像を表示するラベルに設定
-        photo = ImageTk.PhotoImage(adjusted_image)
-        self.label.configure(image=photo)
-        self.label.image = photo
+        self.update_image_brightness()
 
         # 次の更新まで待機
         self.root_after_id_image_without_margin = self.root.after(self.interval * 1000, self.update_image_without_margin_widget)
@@ -321,39 +309,45 @@ class ImageModeScreen:
         random_image_path = os.path.join(image_path, random_image)
         return random_image_path
     
-
-    # 自動明るさ調整
     def automatic_brightness_adjustment(self):
-        # 朝、夜までの時間計算
-        time_to_morning = self.calculate_time_next_trigger(TIME_BRIGHTNESS_HOUR, TIME_BRIGHTNESS_MINUTE)
-        time_to_night = self.calculate_time_next_trigger(TIME_DARKNESS_HOUR, TIME_DARKNESS_MINUTE)
-        if time_to_morning < 1:
-            time_to_morning += 86400
-        if time_to_night < 1:
-            time_to_night += 86400
-
-        # すでに夜の時
-        if time_to_morning < time_to_night:
-            print("今は夜です")
-            self.image_brightness = 0.2
-            self.label_brightness = 0
-        else:
-            print("今は昼です")
+        now = datetime.now().time()
+        now = datetime.strptime("20:14", "%H:%M").time()
+        
+        if now >= datetime.strptime("09:00", "%H:%M").time() and now < datetime.strptime("17:00", "%H:%M").time():
+            # 昼の時間帯は明るさを1.0に設定
             self.image_brightness = 1.0
             self.label_brightness = 1.0
+            print("今は昼間（09:00〜17:00）です。")
+        
+        elif now >= datetime.strptime("21:00", "%H:%M").time() or now < datetime.strptime("05:00", "%H:%M").time():
+            # 夜の時間帯は明るさを0.2に設定
+            self.image_brightness = 0.2
+            self.label_brightness = 0
+            print("今は夜間（21:00〜05:00）です。")
+        
+        else:
+            # 変化する時間帯（05:00 - 09:00、17:00 - 21:00）は徐々に変化させる
+            if now >= datetime.strptime("05:00", "%H:%M").time() and now < datetime.strptime("09:00", "%H:%M").time():
+                # 朝、夜から昼にかけて徐々に明るくする
+                hours_since_6am = (datetime.combine(datetime.today(), now) - datetime.strptime("05:00", "%H:%M")).seconds / 3600
+                self.image_brightness = 0.2 + (0.8 * (hours_since_6am / 4))
+                self.label_brightness = 0 + (1.0 * (hours_since_6am / 4))
+                print(f"今は朝（05:00〜09:00）です。徐々に明るくしています。")
 
-        # 背景色を調整
+            elif now >= datetime.strptime("17:00", "%H:%M").time() and now < datetime.strptime("21:00", "%H:%M").time():
+                # 夕方、昼から夜にかけて徐々に暗くする
+                hours_since_5pm = (datetime.combine(datetime.today(), now) - datetime.strptime("17:00", "%H:%M")).seconds / 3600
+                self.image_brightness = 1.0 - (0.8 * (hours_since_5pm / 4))
+                self.label_brightness = 1.0 - (1.0 * (hours_since_5pm / 4))
+                print(f"今は夕方（17:00〜21:00）です。徐々に暗くしています。")
+
+        # 背景色や画像の更新処理
         self.update_background_color()
+        self.update_image_brightness()
+        
+        # 次の1時間後に再度明るさ調整を予約
+        self.root_after_id_brightness_adjustment = self.root.after(3600 * 1000, self.automatic_brightness_adjustment)
 
-        # 画像色を調整
-        adjusted_image = self.enhancer.enhance(self.image_brightness)
-        photo = ImageTk.PhotoImage(adjusted_image)
-        self.label.configure(image=photo)
-        self.label.image = photo
-
-        # 予約
-        print("明るさが変わるまで：", min(time_to_morning, time_to_night), "秒")
-        self.root_after_id_brightness_adjustment = self.root.after(min(time_to_morning, time_to_night) * 1000, self.automatic_brightness_adjustment)
 
     # 特定の時間までの残り時間を計算
     def calculate_time_next_trigger(self, target_hour, target_minute):
@@ -368,15 +362,27 @@ class ImageModeScreen:
         total_seconds = delta_time.total_seconds()
         return int(total_seconds)
     
+    def update_image_brightness(self):
+        adjusted_image = self.enhancer.enhance(self.image_brightness)
+        photo = ImageTk.PhotoImage(adjusted_image)
+        self.label.configure(image=photo)
+        self.label.image = photo
+    
     def update_background_color(self):
-        bg_color = f'#{int(self.label_brightness*255):02x}{int(self.label_brightness*255):02x}{int(self.label_brightness*255):02x}'
+        original_color_value = int(self.label_brightness * 255)
+        bg_color = f'#{original_color_value:02x}{original_color_value:02x}{original_color_value:02x}'
+        print(original_color_value)
+        if 50 <= original_color_value and original_color_value <= 200:
+            fg_color = 'white'
+        else:
+            fg_color = 'grey'
         self.root.configure(background=bg_color)
         self.label.config(bg=bg_color)
         if self.show_time:
-            self.date_label.config(background=bg_color)
-            self.time_label.config(background=bg_color)
+            self.date_label.config(background=bg_color, foreground=fg_color)
+            self.time_label.config(background=bg_color, foreground=fg_color)
         if self.show_weather:
-            self.weather_label.config(background=bg_color)
+            self.weather_label.config(background=bg_color, foreground=fg_color)
 
 
     # 音楽再生
