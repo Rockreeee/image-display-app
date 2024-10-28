@@ -370,7 +370,6 @@ class ImageModeScreen:
     def update_background_color(self):
         original_color_value = int(self.label_brightness * 255)
         bg_color = f'#{original_color_value:02x}{original_color_value:02x}{original_color_value:02x}'
-        print(original_color_value)
         if 50 <= original_color_value and original_color_value <= 200:
             fg_color = 'white'
         else:
