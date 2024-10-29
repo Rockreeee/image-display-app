@@ -7,12 +7,21 @@
 - 自動調整：指定時間帯での明るさ調整
 - 単語学習：単語を自動表示し、日々の学習に
 
-# 🩻イメージ
+# 🌄 イメージ
+<img src="https://github.com/Rockreeee/image-display-app/raw/main/asset/2.png" alt="代替テキスト" width="100" height="200" />
+<img src="https://github.com/Rockreeee/image-display-app/raw/main/asset/3.png" alt="代替テキスト" width="100" height="200" />
 
-<img src="asset/1.jpg" alt="代替テキスト" width="200" height="200" />
-<img src="asset/2.png" alt="代替テキスト" width="100" height="200" />
-<img src="asset/3.png" alt="代替テキスト" width="100" height="200" />
-<img src="asset/4.png" alt="代替テキスト" width="200" height="140" />
+**日付時間 + 天気予報 + ランダム画像**  
+（左）**昼間**：明るさが最大に設定  
+（右）**夜間**：画面が暗くなり、眩しくない
+
+<img src="https://github.com/Rockreeee/image-display-app/raw/main/asset/1.jpg" alt="代替テキスト" width="200" height="200" />
+
+**画像表示モード**: アート作品や写真を飾るイメージ。
+
+<img src="https://github.com/Rockreeee/image-display-app/raw/main/asset/4.png" alt="代替テキスト" width="200" height="130" />
+
+**勉強モード**: 暗記として使える機能。時間とともに覚えたい単語を表示
 
 # 🖥️ システム要件
 
@@ -59,6 +68,8 @@ python main.py
 
 # 🖼 Image Mode
 ## - 設定変数
+<img src="asset/5.png"/>
+
 - Image Directory: 画像が保存されているディレクトリを選択してください
 - Display Interval: 画像が切り替わるまでの時間
 - Show Margin: 余白を表示するか否か
@@ -83,6 +94,8 @@ python main.py
 
 # 🧠 Study Mode
 ## - 設定変数
+<img src="asset/6.png"/>
+
 - Study Directory: 問題が保存されているディレクトリを選択してください
 - Answer Interval: 答えが出るまでの時間
 - Change Interval: 問題が変わるまでの時間

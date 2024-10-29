@@ -6,3 +6,5 @@ __pycache__/
 
 # Ignore image_display_app.desktop file
 image_display_app.desktop
+
+.settings.json
