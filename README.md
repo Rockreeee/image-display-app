@@ -1,10 +1,23 @@
 # Image Display App
 **思い出の写真を飾り、好きなアートを楽しみながら、日々の時間と天気を確認できるインターフェース**
+
+
+<div style="display: flex; gap: 10px;">
+    <img src="asset/9.jpg" alt="代替テキスト" width="300" height="400" />
+    <img src="asset/8.jpg" alt="代替テキスト" width="300" height="400" />
+</div>
+
+<div style="display: flex; overflow-x: auto; white-space: nowrap;">
+    <img src="asset/8.jpg" alt="代替テキスト" width="300" height="400" style="margin-right: 10px;" />
+    <img src="asset/9.jpg" alt="代替テキスト" width="300" height="400" style="margin-right: 10px;" />
+    <img src="asset/8.jpg" alt="代替テキスト" width="300" height="400" />
+</div>
+
 # 📋主な機能
-- 画像ギャラリー表示：選んだフォルダから写真やアートをランダムに表示
+- 画像表示：写真やアートをランダムに表示
 - 時計表示：シンプルな時計を画面に
-- 天気と降水確率の確認：日々の天気を視覚的に
-- 自動調整：指定時間帯での明るさ調整
+- 天気と降水確率の確認：日々の天気
+- 自動調整：1時間ごとの明るさ調整
 - 単語学習：単語を自動表示し、日々の学習に
 
 # 🌄 イメージ
@@ -65,22 +78,33 @@ pip install beautifulsoup4
 ```zsh
 python main.py
 ```
+# 👏 動作画面の様子
+<img src="https://github.com/Rockreeee/image-display-app/raw/main/asset/7.png" width="200" height="230" /> 
 
-# 🖼 Image Mode
-## - 設定変数
+２つのモードがあります
+- 画像表示モード
+- 勉強モード
+
+## 🖼 Image Mode
 <img src="asset/5.png"/>
 
-- Image Directory: 画像が保存されているディレクトリ
-- Display Interval: 画像が切り替わるまでの時間
-- Show Margin: 余白を表示するか否か
-- Automatic Brightness: 明るさを自動調整するか否か
-- Show Clock: 時間を表示するか否か
-- Show Weather:天気を表示するか否か
+### - 設定
 
-## - キーバインド
+- Image Path: 画像フォルダのパス
+- Image Display Interval: 画像が切り替わるまでの時間
+- Image With Margin: 画像の周りに余白を表示するか否か
+- Automatic Brightness Adjustment: 明るさを自動調整するか否か
+- Show Clock: 時間を表示するか否か
+- Show Weather: 天気を表示するか否か
+- Sound Path: 音楽フォルダのパス
+- Sound Off: 音楽オフ
+- Sound On: 音楽オン
+- Morning Sound Only: 朝の10分間音楽を流す
+
+### - キーバインド
 - \<Escape key> or \<q key>: 終了する
 - \<b key>: 周りの枠の明るさ調整
-- \<i key>: imageの明るさ調整
+- \<i key>: 画像の明るさ調整
 - \<f key>: ウィンドウ大きさ変更
 - \<h key>: カーソル表示切り替え
 - \<v key>: 音量の調整
@@ -88,19 +112,20 @@ python main.py
 - \<Space key>: 次の画像に移動する
 
 
-# 📺 Movie Mode
+## 📺 Movie Mode
 - 実装中
 
 
-# 🧠 Study Mode
-## - 設定変数
+## 🧠 Study Mode
 <img src="asset/6.png"/>
+
+### - 設定
 
 - Study Directory: 問題が保存されているディレクトリ
 - Answer Interval: 答えが出るまでの時間
 - Change Interval: 問題が変わるまでの時間
 
-## - キーバインド
+### - キーバインド
 - \<Escape key> or \<q key>: 終了する
 - \<Space key>: 暗記完了（ループから削除されて、もう表示されない）
 - \<b key>: 明るさ調整
