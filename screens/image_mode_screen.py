@@ -5,7 +5,7 @@ import utils.fetch_weather as fetch_weather
 import utils.music_player as music_player
 import os
 import random
-from datetime import datetime, timedelta
+from datetime import datetime
 import threading
 from tkinter import messagebox
 from time import strftime, localtime
