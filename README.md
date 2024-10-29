@@ -70,12 +70,12 @@ python main.py
 ## - 設定変数
 <img src="asset/5.png"/>
 
-- Image Directory: 画像が保存されているディレクトリを選択してください
+- Image Directory: 画像が保存されているディレクトリ
 - Display Interval: 画像が切り替わるまでの時間
 - Show Margin: 余白を表示するか否か
-- Automatic Brightness: 明るさを自動調整するか否か（21:00に暗くなり、07:00に明るくなる）
-- Show Clock: 時間を表示するか否か（Show Marginもonにする必要があります）
-- Show Weather:天気を表示するか否か（Show Marginもonにする必要があります）(Net環境必要)
+- Automatic Brightness: 明るさを自動調整するか否か
+- Show Clock: 時間を表示するか否か
+- Show Weather:天気を表示するか否か
 
 ## - キーバインド
 - \<Escape key> or \<q key>: 終了する
@@ -96,7 +96,7 @@ python main.py
 ## - 設定変数
 <img src="asset/6.png"/>
 
-- Study Directory: 問題が保存されているディレクトリを選択してください
+- Study Directory: 問題が保存されているディレクトリ
 - Answer Interval: 答えが出るまでの時間
 - Change Interval: 問題が変わるまでの時間
 
