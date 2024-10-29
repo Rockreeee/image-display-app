@@ -1,16 +1,9 @@
 # Image Display App
 **思い出の写真を飾り、好きなアートを楽しみながら、日々の時間と天気を確認できるインターフェース**
 
-
 <div style="display: flex; gap: 10px;">
-    <img src="asset/9.jpg" alt="代替テキスト" width="300" height="400" />
-    <img src="asset/8.jpg" alt="代替テキスト" width="300" height="400" />
-</div>
-
-<div style="display: flex; overflow-x: auto; white-space: nowrap;">
-    <img src="asset/8.jpg" alt="代替テキスト" width="300" height="400" style="margin-right: 10px;" />
-    <img src="asset/9.jpg" alt="代替テキスト" width="300" height="400" style="margin-right: 10px;" />
-    <img src="asset/8.jpg" alt="代替テキスト" width="300" height="400" />
+    <img src="asset/9.jpg" alt="代替テキスト" width="250" height="380" />
+    <img src="asset/8.jpg" alt="代替テキスト" width="250" height="380" />
 </div>
 
 # 📋主な機能
@@ -21,8 +14,10 @@
 - 単語学習：単語を自動表示し、日々の学習に
 
 # 🌄 イメージ
-<img src="https://github.com/Rockreeee/image-display-app/raw/main/asset/2.png" alt="代替テキスト" width="100" height="200" />
-<img src="https://github.com/Rockreeee/image-display-app/raw/main/asset/3.png" alt="代替テキスト" width="100" height="200" />
+<div style="display: flex; gap: 10px;">
+    <img src="asset/2.png" alt="代替テキスト" width="150" height="300" />
+    <img src="asset/3.png" alt="代替テキスト" width="150" height="300" />
+</div>
 
 **日付時間 + 天気予報 + ランダム画像**  
 （左）**昼間**：明るさが最大に設定  
