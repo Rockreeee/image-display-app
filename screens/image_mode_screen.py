@@ -14,6 +14,10 @@ from PIL import Image, ImageEnhance, ImageTk
 # start: カスタム設定
 # 日付UIとディスプレイ距離
 MARGIN_ABOVE_CLOCK = 50
+# 文字の大きさ
+DATE_FONT_SIZE = 30
+TIME_FONT_SIZE = 75
+WEATHER_FONT_SIZE = 25
 # 画像の表示領域に対して何割表示するか 0~1.0
 CONSTANT_MARGIN = 0.7
 # 明るくなる時間
@@ -189,10 +193,8 @@ class ImageModeScreen:
     # 時計のUI作成
     def show_clock_with_margin_widget(self):
         # ラベルを作成
-        date_font_size = self.root.winfo_screenwidth() // 20
-        time_font_size = self.root.winfo_screenwidth() // 10
-        self.date_label = tk.Label(self.root, font=('calibri', date_font_size, 'bold'), bg='white', fg='gray')
-        self.time_label = tk.Label(self.root, font=('calibri', time_font_size, 'bold'), bg='white', fg='gray')
+        self.date_label = tk.Label(self.root, font=('calibri', DATE_FONT_SIZE, 'bold'), bg='white', fg='gray')
+        self.time_label = tk.Label(self.root, font=('calibri', TIME_FONT_SIZE, 'bold'), bg='white', fg='gray')
 
         # ラベルの高さを取得して時間ラベルを配置
         self.date_label.pack(pady=(MARGIN_ABOVE_CLOCK, 0))
@@ -204,10 +206,8 @@ class ImageModeScreen:
     # 時計のUI作成
     def show_clock_without_margin_widget(self):
         # ラベルを作成
-        date_font_size = self.root.winfo_screenwidth() // 20
-        time_font_size = self.root.winfo_screenwidth() // 10
-        self.date_label = self.canvas.create_text(self.root.winfo_screenwidth() // 4, self.root.winfo_screenheight() - 400, font=('calibri', date_font_size, 'bold'), fill="white")
-        self.time_label = self.canvas.create_text(self.root.winfo_screenwidth() // 4, self.root.winfo_screenheight() - 200, font=('calibri', time_font_size, 'bold'), fill="white")
+        self.date_label = self.canvas.create_text(self.root.winfo_screenwidth() // 4, self.root.winfo_screenheight() - 300, font=('calibri', DATE_FONT_SIZE, 'bold'), fill="white")
+        self.time_label = self.canvas.create_text(self.root.winfo_screenwidth() // 4, self.root.winfo_screenheight() - 150, font=('calibri', TIME_FONT_SIZE, 'bold'), fill="white")
 
         # 日付と曜日、時間を更新する関数を初回呼び出し
         self.update_time()
@@ -233,8 +233,7 @@ class ImageModeScreen:
     # 天気のUI作成
     def show_weather_with_margin_widget(self):
         # 天気を表示するラベルを作成
-        weather_font_size = self.root.winfo_screenwidth() // 30
-        self.weather_label = tk.Label(self.root, font=('calibri', weather_font_size, 'bold'), bg='white', fg='gray')
+        self.weather_label = tk.Label(self.root, font=('calibri', WEATHER_FONT_SIZE, 'bold'), bg='white', fg='gray')
 
         # ラベルの高さを取得して天気ラベルを配置
         clock_height = 0
@@ -248,8 +247,7 @@ class ImageModeScreen:
     # 天気のUI作成
     def show_weather_without_margin_widget(self):
         # 天気を表示するラベルを作成し、配置
-        weather_font_size = self.root.winfo_screenwidth() // 30
-        self.weather_label = self.canvas.create_text(self.root.winfo_screenwidth() // 1.25, self.root.winfo_screenheight() - 250, font=('calibri', weather_font_size, 'bold'), fill="white")
+        self.weather_label = self.canvas.create_text(self.root.winfo_screenwidth() // 1.3, self.root.winfo_screenheight() - 200, font=('calibri', WEATHER_FONT_SIZE, 'bold'), fill="white")
 
         # １時間ごとに天気更新
         self.update_weather()
@@ -420,14 +418,14 @@ class ImageModeScreen:
             self.canvas.tag_lower(image_id)
     
     def update_background_color(self):
-        original_color_value = int(self.label_brightness * 255)
-        bg_color = f'#{original_color_value:02x}{original_color_value:02x}{original_color_value:02x}'
-        if 50 <= original_color_value and original_color_value <= 200:
-            fg_color = 'white'
-        else:
-            fg_color = 'grey'
 
         if self.show_margin:
+            original_color_value = int(self.label_brightness * 255)
+            bg_color = f'#{original_color_value:02x}{original_color_value:02x}{original_color_value:02x}'
+            if 50 <= original_color_value and original_color_value <= 200:
+                fg_color = 'white'
+            else:
+                fg_color = 'grey'
             self.root.configure(background=bg_color)
             self.label.config(bg=bg_color)
             if self.show_time:
@@ -436,11 +434,13 @@ class ImageModeScreen:
             if self.show_weather:
                 self.weather_label.config(background=bg_color, foreground=fg_color)
         else:
-            if self.show_time:
-                self.canvas.itemconfig(self.date_label, fill=fg_color)
-                self.canvas.itemconfig(self.time_label, fill=fg_color)
-            if self.show_weather:
-                self.canvas.itemconfig(self.weather_label, fill=fg_color)
+            original_color_value = int(self.label_brightness * 255)
+            fg_color = f'#{original_color_value:02x}{original_color_value:02x}{original_color_value:02x}'
+            # if self.show_time:
+            #     self.canvas.itemconfig(self.date_label, fill=fg_color)
+            #     self.canvas.itemconfig(self.time_label, fill=fg_color)
+            # if self.show_weather:
+            #     self.canvas.itemconfig(self.weather_label, fill=fg_color)
 
 
     # 音楽再生
