@@ -60,10 +60,10 @@ class ImageModeScreen:
         self.root.bind("<Escape>", self.close_window)
         self.root.bind("<q>", self.close_window)
 
-        # 明るさを調整するキーバインド
+        # 文字の明るさを調整するキーバインド
         self.root.bind("<b>", self.label_brightness_adjustment)
 
-        # 明るさを調整するキーバインド
+        # 画像の明るさを調整するキーバインド
         self.root.bind("<i>", self.image_brightness_adjustment)
 
         # キーイベントをバインドしてフルスクリーン表示の切り替えを有効にする
@@ -94,10 +94,14 @@ class ImageModeScreen:
 
     # 明るさを調整する関数
     def label_brightness_adjustment(self, event):
-        self.label_brightness -= 0.2
-        if self.label_brightness < 0:
-            self.label_brightness = 1
-        self.update_background_color()
+        if not hasattr(self, 'label_brightness'):
+            print("文字が定義されていません")
+            return
+        else:
+            self.label_brightness -= 0.2
+            if self.label_brightness < 0:
+                self.label_brightness = 1
+            self.update_background_color()
 
     # 明るさを調整する関数
     def image_brightness_adjustment(self, event):
@@ -138,22 +142,37 @@ class ImageModeScreen:
 
     # UI作成
     def create_widgets(self):
-        self.label = tk.Label(self.root, bg='white')
-        self.label.pack(fill=tk.BOTH, expand=True, side="bottom")
 
-        # 時計を表示
-        if self.show_time:
-            self.show_clock_widget()
-            
-        # 天気を表示
-        if self.show_weather:
-            self.show_weather_widget()
-
-        # 画像を表示
+        # 余白を表示
         if self.show_margin:
+            self.label = tk.Label(self.root, bg='white')
+            self.label.pack(fill=tk.BOTH, expand=True, side="bottom")
+            # 時計を表示
+            if self.show_time:
+                self.show_clock_with_margin_widget()
+                
+            # 天気を表示
+            if self.show_weather:
+                self.show_weather_with_margin_widget()
+
+            # 余白あり画像表示
             self.update_image_with_margin_widget()
+                
         else:
+            self.canvas = tk.Canvas(self.root, bg='white')
+            self.canvas.pack(fill=tk.BOTH, expand=True)
+
+            # 時計を表示
+            if self.show_time:
+                self.show_clock_without_margin_widget()
+
+            # 天気を表示
+            if self.show_weather:
+                self.show_weather_without_margin_widget()
+
+            # 余白なし画像を表示
             self.update_image_without_margin_widget()
+
 
         # 自動明るさ調整
         if self.automatic_brightness:
@@ -168,7 +187,7 @@ class ImageModeScreen:
 
 
     # 時計のUI作成
-    def show_clock_widget(self):
+    def show_clock_with_margin_widget(self):
         # ラベルを作成
         date_font_size = self.root.winfo_screenwidth() // 20
         time_font_size = self.root.winfo_screenwidth() // 10
@@ -182,6 +201,17 @@ class ImageModeScreen:
         # 日付と曜日、時間を更新する関数を初回呼び出し
         self.update_time()
 
+    # 時計のUI作成
+    def show_clock_without_margin_widget(self):
+        # ラベルを作成
+        date_font_size = self.root.winfo_screenwidth() // 20
+        time_font_size = self.root.winfo_screenwidth() // 10
+        self.date_label = self.canvas.create_text(self.root.winfo_screenwidth() // 4, self.root.winfo_screenheight() - 400, font=('calibri', date_font_size, 'bold'), fill="white")
+        self.time_label = self.canvas.create_text(self.root.winfo_screenwidth() // 4, self.root.winfo_screenheight() - 200, font=('calibri', time_font_size, 'bold'), fill="white")
+
+        # 日付と曜日、時間を更新する関数を初回呼び出し
+        self.update_time()
+
     # 時計のUI更新
     def update_time(self):
         # 現在の時間と日付を取得
@@ -189,15 +219,19 @@ class ImageModeScreen:
         current_date = strftime('%Y-%m-%d %A', localtime())
 
         # ラベルのテキストを更新
-        self.time_label.config(text=current_time)
-        self.date_label.config(text=current_date)
+        if self.show_margin:
+            self.time_label.config(text=current_time)
+            self.date_label.config(text=current_date)
+        else:
+            self.canvas.itemconfig(self.time_label, text=current_time)
+            self.canvas.itemconfig(self.date_label, text=current_date)
 
         # 次の更新まで待機
         self.root_after_id_time = self.root.after(1000, self.update_time)
 
 
     # 天気のUI作成
-    def show_weather_widget(self):
+    def show_weather_with_margin_widget(self):
         # 天気を表示するラベルを作成
         weather_font_size = self.root.winfo_screenwidth() // 30
         self.weather_label = tk.Label(self.root, font=('calibri', weather_font_size, 'bold'), bg='white', fg='gray')
@@ -211,18 +245,32 @@ class ImageModeScreen:
         # １時間ごとに天気更新
         self.update_weather()
 
+    # 天気のUI作成
+    def show_weather_without_margin_widget(self):
+        # 天気を表示するラベルを作成し、配置
+        weather_font_size = self.root.winfo_screenwidth() // 30
+        self.weather_label = self.canvas.create_text(self.root.winfo_screenwidth() // 1.25, self.root.winfo_screenheight() - 250, font=('calibri', weather_font_size, 'bold'), fill="white")
+
+        # １時間ごとに天気更新
+        self.update_weather()
+
     # 天気のUI更新
     def update_weather(self):
         # 天気データの取得
         print("天気を更新します。")
         forecast_data = fetch_weather.get_precipitation_forecast()
-        self.weather_label.config(text=forecast_data["weather"]
-                                  + "     " + "↑" + forecast_data["high_temperature_value"] + "°" 
-                                  + " " + "↓" + forecast_data["low_temperature_value"] + "°" + "\n" 
-                                  + "00~06" + ":" + forecast_data["probabilities"][0] + "%" + " " 
-                                  + "06~12" + ":" + forecast_data["probabilities"][1] + "%" + " " + "\n"
-                                  + "12~18" + ":" + forecast_data["probabilities"][2] + "%" + " " 
-                                  + "18~24" + ":" + forecast_data["probabilities"][3] + "%" + " ")
+        forecast_text = ("     " + forecast_data["weather"] + "     " 
+                + "↑" + forecast_data["high_temperature_value"] + "°" + " " 
+                + "↓" + forecast_data["low_temperature_value"] + "°" + "\n" 
+                + "00~06" + ":" + forecast_data["probabilities"][0] + "%" + " " 
+                + "06~12" + ":" + forecast_data["probabilities"][1] + "%" + " " + "\n"
+                + "12~18" + ":" + forecast_data["probabilities"][2] + "%" + " " 
+                + "18~24" + ":" + forecast_data["probabilities"][3] + "%" + " ")
+        
+        if self.show_margin:
+            self.weather_label.config(text=forecast_text)
+        else:
+            self.canvas.itemconfig(self.weather_label, text=forecast_text)
 
         # 次の更新まで待機
         self.root_after_id_weather = self.root.after(3600 * 1000, self.update_weather)
@@ -363,9 +411,13 @@ class ImageModeScreen:
     
     def update_image_brightness(self):
         adjusted_image = self.enhancer.enhance(self.image_brightness)
-        photo = ImageTk.PhotoImage(adjusted_image)
-        self.label.configure(image=photo)
-        self.label.image = photo
+        self.photo = ImageTk.PhotoImage(adjusted_image)
+        if self.show_margin:
+            self.label.configure(image=self.photo)
+            self.label.image = self.photo
+        else:
+            image_id = self.canvas.create_image(0, 0, anchor="nw", image=self.photo)
+            self.canvas.tag_lower(image_id)
     
     def update_background_color(self):
         original_color_value = int(self.label_brightness * 255)
@@ -374,13 +426,21 @@ class ImageModeScreen:
             fg_color = 'white'
         else:
             fg_color = 'grey'
-        self.root.configure(background=bg_color)
-        self.label.config(bg=bg_color)
-        if self.show_time:
-            self.date_label.config(background=bg_color, foreground=fg_color)
-            self.time_label.config(background=bg_color, foreground=fg_color)
-        if self.show_weather:
-            self.weather_label.config(background=bg_color, foreground=fg_color)
+
+        if self.show_margin:
+            self.root.configure(background=bg_color)
+            self.label.config(bg=bg_color)
+            if self.show_time:
+                self.date_label.config(background=bg_color, foreground=fg_color)
+                self.time_label.config(background=bg_color, foreground=fg_color)
+            if self.show_weather:
+                self.weather_label.config(background=bg_color, foreground=fg_color)
+        else:
+            if self.show_time:
+                self.canvas.itemconfig(self.date_label, fill=fg_color)
+                self.canvas.itemconfig(self.time_label, fill=fg_color)
+            if self.show_weather:
+                self.canvas.itemconfig(self.weather_label, fill=fg_color)
 
 
     # 音楽再生
