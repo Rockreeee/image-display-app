@@ -296,7 +296,7 @@ class ImageModeScreen:
             weather_height = self.weather_label.winfo_height()
 
         # ランダムな画像を選択
-        random_image_path = self.make_random_image_path(image_path=self.image_path)
+        random_image_path = self.make_random_file_path(path=self.image_path, files=self.image_files)
 
         # 画像UIを配置
         img = Image.open(random_image_path)
@@ -321,7 +321,7 @@ class ImageModeScreen:
     # 画像（マージンなし）のUI作成
     def update_image_without_margin_widget(self):
         # ランダムな画像を選択
-        random_image_path = self.make_random_image_path(image_path=self.image_path)
+        random_image_path = self.make_random_file_path(path=self.image_path, files=self.image_files)
 
         # 画像UIを配置
         img = Image.open(random_image_path)
@@ -350,10 +350,10 @@ class ImageModeScreen:
         self.root_after_id_image_without_margin = self.root.after(self.interval * 1000, self.update_image_without_margin_widget)
 
     # ランダムな画像を選ぶ関数
-    def make_random_image_path(self, image_path):
-        random_image = random.choice(self.image_files)
-        random_image_path = os.path.join(image_path, random_image)
-        return random_image_path
+    def make_random_file_path(self, path, files):
+        random_file = random.choice(files)
+        random_file_path = os.path.join(path, random_file)
+        return random_file_path
     
     def automatic_brightness_adjustment(self):
         now = datetime.now().time()
