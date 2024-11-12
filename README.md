@@ -4,9 +4,8 @@
 <div style="display: flex; gap: 10px;">
     <img src="asset/9.jpg" alt="代替テキスト" width="250" height="380" />
     <img src="asset/8.jpg" alt="代替テキスト" width="250" height="380" />
-    <img src="asset/13.png" alt="代替テキスト" width="250" height="380" />
-    <img src="asset/14.png" alt="代替テキスト" width="250" height="380" />
-    <img src="asset/15.png" alt="代替テキスト" width="250" height="380" />
+    <img src="asset/13.jpg" alt="代替テキスト" width="250" height="380" />
+    <img src="asset/14.jpg" alt="代替テキスト" width="250" height="380" />
 </div>
 
 # 📋主な機能
