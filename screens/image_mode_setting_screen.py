@@ -78,13 +78,13 @@ class ImageModeSettingScreen:
 
     def select_image_path(self):
         """画像ファイル選択ダイアログを表示"""
-        path = filedialog.askdirectory()
+        path = filedialog.askdirectory(initialdir=self.image_path_var)
         if path:
             self.image_path_var.set(path)
 
     def select_sound_path(self):
         """サウンドファイル選択ダイアログを表示"""
-        path = filedialog.askdirectory()
+        path = filedialog.askdirectory(initialdir=self.sound_path_var)
         if path:
             self.sound_path_var.set(path)
 

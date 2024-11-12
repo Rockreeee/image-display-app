@@ -59,9 +59,10 @@ class StudyModeSettingScreen:
         tk.Checkbutton(frame, variable=variable).grid(row=row, column=1, sticky="w")
 
     def select_study_file(self):
-        """画像ファイル選択ダイアログを表示"""
+        """勉強ファイル選択ダイアログを表示"""
         path = filedialog.askopenfilename(
-            title="Select a sound file"
+            title="Select a sound file",
+            initialdir = self.study_file_var
         )
         if path:
             self.study_file_var.set(path)
