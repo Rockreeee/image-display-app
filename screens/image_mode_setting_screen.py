@@ -40,8 +40,8 @@ class ImageModeSettingScreen:
 
         # ラベル・エントリ・ボタンの設定
         self.create_label_entry_button(settings_frame, "Image Path: *", self.image_path_var, self.select_image_path, row=0)
-        self.create_label_entry(settings_frame, "Image Display Interval (seconds): *", self.interval_var, row=1)
-        self.create_checkbutton(settings_frame, "Image With Margin", self.show_margin_var, row=2)
+        self.create_label_entry(settings_frame, "Display Interval (seconds): *", self.interval_var, row=1)
+        self.create_checkbutton(settings_frame, "With Margin", self.show_margin_var, row=2)
         self.create_checkbutton(settings_frame, "Automatic Brightness Adjustment", self.automatic_brightness_var, row=3)
         self.create_checkbutton(settings_frame, "Show Clock", self.show_time_var, row=4)
         self.create_checkbutton(settings_frame, "Show Weather", self.show_weather_var, row=5)
