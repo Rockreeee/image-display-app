@@ -10,6 +10,7 @@ import threading
 from tkinter import messagebox
 from time import strftime, localtime
 from PIL import Image, ImageEnhance, ImageTk
+import re
 
 # start: カスタム設定
 # 日付UIとディスプレイ距離
@@ -247,7 +248,7 @@ class ImageModeScreen:
     # 天気のUI作成
     def show_weather_without_margin_widget(self):
         # 天気を表示するラベルを作成し、配置
-        self.weather_label = self.canvas.create_text(self.root.winfo_screenwidth() // 1.3, self.root.winfo_screenheight() - 200, font=('calibri', WEATHER_FONT_SIZE, 'bold'), fill="white")
+        self.weather_label = self.canvas.create_text(self.root.winfo_screenwidth() // 1.3, self.root.winfo_screenheight() - 175, font=('calibri', WEATHER_FONT_SIZE, 'bold'), fill="white")
 
         # １時間ごとに天気更新
         self.update_weather()
@@ -257,18 +258,25 @@ class ImageModeScreen:
         # 天気データの取得
         print("天気を更新します。")
         forecast_data = fetch_weather.get_precipitation_forecast()
-        forecast_text = ("     " + forecast_data["weather"] + "     " 
-                + "↑" + forecast_data["high_temperature_value"] + "°" + " " 
+        forecast_text = (forecast_data["weather"] + "　" 
+                + "↑" + forecast_data["high_temperature_value"] + "°"
                 + "↓" + forecast_data["low_temperature_value"] + "°" + "\n" 
-                + "00~06" + ":" + forecast_data["probabilities"][0] + "%" + " " 
-                + "06~12" + ":" + forecast_data["probabilities"][1] + "%" + " " + "\n"
-                + "12~18" + ":" + forecast_data["probabilities"][2] + "%" + " " 
-                + "18~24" + ":" + forecast_data["probabilities"][3] + "%" + " ")
+                + "00~06" + ":" + forecast_data["probabilities"][0] + "%" + "　" 
+                + "06~12" + ":" + forecast_data["probabilities"][1] + "%" + "\n"
+                + "12~18" + ":" + forecast_data["probabilities"][2] + "%" + "　" 
+                + "18~24" + ":" + forecast_data["probabilities"][3] + "%" + "\n"
+                + "\n"
+                + re.search(r'\((.*?)\)', forecast_data["weather_data"][0]['date']).group(1) + ":" +  forecast_data["weather_data"][0]['weather'] + "　"
+                + re.search(r'\((.*?)\)', forecast_data["weather_data"][1]['date']).group(1) + ":" +  forecast_data["weather_data"][1]['weather'] + "\n"
+                + re.search(r'\((.*?)\)', forecast_data["weather_data"][2]['date']).group(1) + ":" +  forecast_data["weather_data"][2]['weather'] + "　"
+                + re.search(r'\((.*?)\)', forecast_data["weather_data"][3]['date']).group(1) + ":" +  forecast_data["weather_data"][3]['weather'] + "\n"
+                + re.search(r'\((.*?)\)', forecast_data["weather_data"][4]['date']).group(1) + ":" +  forecast_data["weather_data"][4]['weather'] + "　"
+                + re.search(r'\((.*?)\)', forecast_data["weather_data"][5]['date']).group(1) + ":" +  forecast_data["weather_data"][5]['weather'] + "\n")
         
         if self.show_margin:
             self.weather_label.config(text=forecast_text)
         else:
-            self.canvas.itemconfig(self.weather_label, text=forecast_text)
+            self.canvas.itemconfig(self.weather_label, text=forecast_text, anchor="center", justify="center")
 
         # 次の更新まで待機
         self.root_after_id_weather = self.root.after(3600 * 1000, self.update_weather)
@@ -409,7 +417,7 @@ class ImageModeScreen:
     
     def update_image_brightness(self):
         adjusted_image = self.enhancer.enhance(self.image_brightness)
-        self.photo = ImageTk.PhotoImage(adjusted_image)
+        self.photo = ImageTk.PhotoImage(adjusted_image) # 何故かself.しないといけない
         if self.show_margin:
             self.label.configure(image=self.photo)
             self.label.image = self.photo
