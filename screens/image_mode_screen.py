@@ -266,12 +266,12 @@ class ImageModeScreen:
                 + "12~18" + ":" + forecast_data["probabilities"][2] + "%" + "　" 
                 + "18~24" + ":" + forecast_data["probabilities"][3] + "%" + "\n"
                 + "\n"
-                + re.search(r'\((.*?)\)', forecast_data["weather_data"][0]['date']).group(1) + ":" +  forecast_data["weather_data"][0]['weather'] + "　"
-                + re.search(r'\((.*?)\)', forecast_data["weather_data"][1]['date']).group(1) + ":" +  forecast_data["weather_data"][1]['weather'] + "\n"
-                + re.search(r'\((.*?)\)', forecast_data["weather_data"][2]['date']).group(1) + ":" +  forecast_data["weather_data"][2]['weather'] + "　"
-                + re.search(r'\((.*?)\)', forecast_data["weather_data"][3]['date']).group(1) + ":" +  forecast_data["weather_data"][3]['weather'] + "\n"
-                + re.search(r'\((.*?)\)', forecast_data["weather_data"][4]['date']).group(1) + ":" +  forecast_data["weather_data"][4]['weather'] + "　"
-                + re.search(r'\((.*?)\)', forecast_data["weather_data"][5]['date']).group(1) + ":" +  forecast_data["weather_data"][5]['weather'] + "\n")
+                + re.search(r'\((.*?)\)', forecast_data["weather_data"][1]['date']).group(1) + ":" +  forecast_data["weather_data"][1]['weather'] + "　"
+                + re.search(r'\((.*?)\)', forecast_data["weather_data"][2]['date']).group(1) + ":" +  forecast_data["weather_data"][2]['weather'] + "\n"
+                + re.search(r'\((.*?)\)', forecast_data["weather_data"][3]['date']).group(1) + ":" +  forecast_data["weather_data"][3]['weather'] + "　"
+                + re.search(r'\((.*?)\)', forecast_data["weather_data"][4]['date']).group(1) + ":" +  forecast_data["weather_data"][4]['weather'] + "\n"
+                + re.search(r'\((.*?)\)', forecast_data["weather_data"][5]['date']).group(1) + ":" +  forecast_data["weather_data"][5]['weather'] + "　"
+                + re.search(r'\((.*?)\)', forecast_data["weather_data"][6]['date']).group(1) + ":" +  forecast_data["weather_data"][6]['weather'] + "\n")
         
         if self.show_margin:
             self.weather_label.config(text=forecast_text)

@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import re
 
 def get_precipitation_forecast():
 
@@ -20,7 +21,6 @@ def get_precipitation_forecast():
             high_temperature_value = ""
             # 降水確率を格納するリスト
             probabilities = []
-
 
             # classがweather-telopのp要素を取得
             weather_telop = soup.find('p', class_='weather-telop')
@@ -44,7 +44,7 @@ def get_precipitation_forecast():
                     high_temperature_value = "--"
             else:
                 print("要素が見つかりませんでした")
-
+            
 
             # classがlow-temp tempのdd要素を取得
             temperature_dd = soup.find('dd', class_='low-temp temp')
@@ -76,12 +76,40 @@ def get_precipitation_forecast():
             else:
                 print("要素が見つかりませんでした")
 
+            
+            # 今日と明日の天気を取得
+            # 天気データを格納するリスト
+            today_and_tomorrow_weather_data = []
+            # forecast-days-wrap clearfixの中のみを対象にする
+            forecast_wrap = soup.find('div', class_='forecast-days-wrap clearfix')
+            for section in forecast_wrap.find_all('section'):
+                date = section.find('h3').get_text().strip()  # 日付と曜日
+                
+                # 正規表現を使って「11月17日(日)」のように抽出
+                date_match = re.search(r'(\d{1,2}月\d{1,2}日)\((.*?)\)', date)
+                if date_match:
+                    date = f"{date_match.group(1)}({date_match.group(2)})"  # 日付と曜日のフォーマットを整える
 
-            # １週間の天気を取得
+                weather = section.find('p', class_='weather-telop').get_text().strip()  # 天気
+                high_temp = section.find('dd', class_='high-temp temp').find('span', class_='value').get_text().strip()  # 最高気温
+                low_temp = section.find('dd', class_='low-temp temp').find('span', class_='value').get_text().strip()  # 最低気温
+                precip = section.find('tr', class_='rain-probability').find_all('td')[2].get_text().strip()  # 降水確率
+
+                # 抽出したデータを辞書形式で格納
+                today_and_tomorrow_weather_data.append({
+                    'date': date,
+                    'weather': weather,
+                    'high_temp': high_temp,
+                    'low_temp': low_temp,
+                    'precip': precip
+                })
+            
+
+            # ９日間の天気を取得
             # 天気テーブルを抽出
             forecast_table = soup.find('table', class_='forecast-point-week forecast-days-long')
             # 各日の天気情報を格納するリスト
-            weather_data = []
+            nine_days_weather_data = []
             # 各行を取得
             days = forecast_table.find_all('tr')
 
@@ -92,14 +120,14 @@ def get_precipitation_forecast():
                     dates = day.find_all('td', class_='cityday')
                     for date in dates:
                         date_text = date.get_text(strip=True)
-                        weather_data.append({'date': date_text})
+                        nine_days_weather_data.append({'date': date_text})
                 
                 # 天気情報
                 elif i == 1:
                     weathers = day.find_all('td', class_='weather-icon')
                     for j, weather in enumerate(weathers):
                         weather_desc = weather.find('p').get_text(strip=True)
-                        weather_data[j]['weather'] = weather_desc
+                        nine_days_weather_data[j]['weather'] = weather_desc
                 
                 # 気温情報
                 elif i == 2:
@@ -107,22 +135,22 @@ def get_precipitation_forecast():
                     for j, temp in enumerate(temperatures):  # 最初のtdは日付なのでスキップ
                         high_temp = temp.find_all('p')[0].get_text(strip=True)
                         low_temp = temp.find_all('p')[1].get_text(strip=True)
-                        weather_data[j]['high_temp'] = high_temp
-                        weather_data[j]['low_temp'] = low_temp
+                        nine_days_weather_data[j]['high_temp'] = high_temp
+                        nine_days_weather_data[j]['low_temp'] = low_temp
                 
                 # 降水確率情報
                 elif i == 3:
                     precipitations = day.find_all('td')
                     for j, precip in enumerate(precipitations):  # 最初のtdは日付なのでスキップ
                         precip = precip.find('p').get_text(strip=True)
-                        weather_data[j]['precip'] = precip
+                        nine_days_weather_data[j]['precip'] = precip
 
             return {
                 "weather": weather_text,
                 "high_temperature_value": high_temperature_value,
                 "low_temperature_value": low_temperature_value,
                 "probabilities": probabilities,
-                "weather_data": weather_data
+                "weather_data": today_and_tomorrow_weather_data + nine_days_weather_data
             }
         
     except requests.exceptions.RequestException as e:
