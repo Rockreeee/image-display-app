@@ -1,6 +1,6 @@
 import tkinter as tk
 import screens.image_mode_setting_screen as image_mode_setting_screen
-import screens.video_mode_setting_screen as video_mode_setting_screen
+# import screens.video_mode_setting_screen as video_mode_setting_screen
 import screens.study_mode_setting_screen as study_mode_setting_screen
 import utils.settings_manager as settings_manager
 
