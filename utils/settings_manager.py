@@ -9,6 +9,7 @@ def load_settings():
     default_settings = {
         "mode": "Image",
         "image_path": "",
+        "video_path": "",
         "interval": "3600",
         "show_margin": True,
         "automatic_brightness": True,
@@ -16,8 +17,6 @@ def load_settings():
         "show_weather": True,
         "sound_path": "",
         "sound_mode": "0",
-        "video_directory": "",
-        "video_interval": "60",
         "study_file": "",
         "study_answer_interval": "2",
         "study_change_interval": "2"
