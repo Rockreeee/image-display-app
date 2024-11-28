@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-import os
+import re
 from PIL import Image
 
 def get_precipitation_forecast():
@@ -31,19 +31,21 @@ def get_precipitation_forecast():
         if forecast_wrap:
             for section in forecast_wrap.find_all('section'):
                 date = section.find('h3').text.strip() if section.find('h3') else "--"
+                weekday = get_english_weekday(re.search(r'\((.*?)\)', date).group(1))
                 weather = section.find('p', class_='weather-telop').text.strip() if section.find('p', class_='weather-telop') else "--"
                 high_temp = section.find('dd', class_='high-temp temp').find('span', class_='value').text.strip() if section.find('dd', class_='high-temp temp') else "--"
                 low_temp = section.find('dd', class_='low-temp temp').find('span', class_='value').text.strip() if section.find('dd', class_='low-temp temp') else "--"
                 precip = section.find('tr', class_='rain-probability').find_all('td')[2].text.strip() if section.find('tr', class_='rain-probability') else "--"
-                weather_image_path = get_weather_image(weather)
+                weather_icon = get_weather_icon(weather)
 
                 today_and_tomorrow_weather_data.append({
                     'date': date,
+                    'weekday': weekday,
                     'weather': weather,
                     'high_temp': high_temp,
                     'low_temp': low_temp,
                     'precip': precip,
-                    'weather_image_path': weather_image_path
+                    'weather_icon': weather_icon
                 })
 
         # 9日間の天気
@@ -53,15 +55,18 @@ def get_precipitation_forecast():
             for i, row in enumerate(rows):
                 if i == 0:  # 日付
                     dates = row.find_all('td', class_='cityday')
-                    for date in dates:
+                    for j, date in enumerate(dates):
                         date_text = date.text.strip() if date else "--"
-                        nine_days_weather_data.append({'date': date_text})
+                        # 日付から曜日を抽出し英語に変換
+                        match = re.search(r'\((.*?)\)', date_text)
+                        weekday = get_english_weekday(match.group(1)) if match else "--"
+                        nine_days_weather_data.append({'date': date_text, 'weekday': weekday})
                 elif i == 1:  # 天気
                     weathers = row.find_all('td', class_='weather-icon')
                     for j, weather in enumerate(weathers):
                         weather_desc = weather.find('p').text.strip() if weather.find('p') else "--"
                         nine_days_weather_data[j]['weather'] = weather_desc
-                        nine_days_weather_data[j]['weather_image_path'] = get_weather_image(weather_desc)
+                        nine_days_weather_data[j]['weather_icon'] = get_weather_icon(weather_desc)
                 elif i == 2:  # 気温
                     temperatures = row.find_all('td')
                     for j, temp in enumerate(temperatures):
@@ -75,9 +80,9 @@ def get_precipitation_forecast():
                         precip_text = precip.find('p').text.strip() if precip.find('p') else "--"
                         nine_days_weather_data[j]['precip'] = precip_text
 
-        print(
-            "today_probabilities", today_probabilities,
-            "weather_data", today_and_tomorrow_weather_data + nine_days_weather_data)
+        # print(
+        #     "today_probabilities", today_probabilities,
+        #     "weather_data", today_and_tomorrow_weather_data + nine_days_weather_data)
 
         return {
             "today_probabilities": today_probabilities,
@@ -94,27 +99,42 @@ def get_precipitation_forecast():
         "weather_data": []
     }
 
-def get_weather_image(weather_text, image_folder="utils/weather_images"):
+def get_weather_icon(weather_text):
     # 天気テキストと画像ファイル名の対応表
     weather_to_image_map = {
-        "晴": "sunny.png",
-        "雨": "rainy.png",
-        "曇": "cloudy.png",
-        "雪": "snowy.png",
-        "暴風雨": "storm.png",
-        "暴風雪": "snowy.png",
-        "晴後雨": "sunny_or_rainy.png",
-        "晴時々曇": "sunny_or_rainy.png",
-        "曇時々晴": "sunny_or_rainy.png",
+        "晴": "☀",
+        "雨": "⛆",
+        "曇": "☁",
+        "雪": "⛇",
+        "暴風雨": "⛈",
+        "暴風雪": "⛇",
+        "晴後雨": "⛅︎",
+        "晴時々曇": "⛅︎",
+        "曇時々晴": "⛅︎",
     }
 
     # 天気画像フォルダ内の対応する画像ファイル名を取得
-    image_file_name = weather_to_image_map.get(weather_text, None)
-    if not image_file_name:
+    image_icon = weather_to_image_map.get(weather_text, None)
+    if not image_icon:
         print(f"対応する天気画像が見つかりません: {weather_text}")
         return ""
 
-    # 画像ファイルの完全なパスを取得
-    image_path = os.path.join(image_folder, image_file_name)
+    return image_icon
 
-    return image_path
+def get_english_weekday(japanese_weekday):
+    # 日本語曜日と英語曜日の対応表
+    japanese_to_english_map = {
+        "日": "Sun.",
+        "月": "Mon.",
+        "火": "Tue.",
+        "水": "Wed.",
+        "木": "Thu.",
+        "金": "Fri.",
+        "土": "Sat.",
+    }
+
+    # 対応する英語の曜日を取得
+    english_weekday = japanese_to_english_map.get(japanese_weekday)
+    if not english_weekday:
+        print(f"対応する曜日が見つかりません: {japanese_weekday}")
+    return english_weekday

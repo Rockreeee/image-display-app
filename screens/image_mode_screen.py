@@ -18,6 +18,7 @@ MARGIN_ABOVE_CLOCK = 50
 # 文字の大きさ
 DATE_FONT_SIZE = 30
 TIME_FONT_SIZE = 75
+WEATHER_ICON_SIZE = 50
 WEATHER_FONT_SIZE = 25
 # 画像の表示領域に対して何割表示するか 0~1.0
 CONSTANT_MARGIN = 0.7
@@ -250,7 +251,6 @@ class ImageModeScreen:
     def show_weather_without_margin_widget(self):
         # 天気を表示するラベルを作成し、配置
         self.weather_label = self.canvas.create_text(self.root.winfo_screenwidth() // 1.3, self.root.winfo_screenheight() - 175, font=('calibri', WEATHER_FONT_SIZE, 'bold'), fill="white")
-        self.weather_image = self.canvas.create_image(100, 100)
 
         # １時間ごとに天気更新
         self.update_weather()
@@ -260,23 +260,14 @@ class ImageModeScreen:
         # 天気データの取得
         print("天気を更新します。")
         forecast_data = fetch_weather.get_precipitation_forecast()
-        forecast_text = (forecast_data["weather_data"][0]['weather'] + "　" 
-                + "↑" + forecast_data["weather_data"][0]['high_temp'] + "°"
-                + "↓" + forecast_data["weather_data"][0]['low_temp'] + "°" + "\n" 
-                + "00~06" + ":" + forecast_data["today_probabilities"][0] + "%" + "　" 
-                + "06~12" + ":" + forecast_data["today_probabilities"][1] + "%" + "\n"
-                + "12~18" + ":" + forecast_data["today_probabilities"][2] + "%" + "　" 
-                + "18~24" + ":" + forecast_data["today_probabilities"][3] + "%" + "\n"
-                + "\n"
-                + re.search(r'\((.*?)\)', forecast_data["weather_data"][1]['date']).group(1) + ":" +  forecast_data["weather_data"][1]['weather'] + "　"
-                + re.search(r'\((.*?)\)', forecast_data["weather_data"][2]['date']).group(1) + ":" +  forecast_data["weather_data"][2]['weather'] + "\n"
-                + re.search(r'\((.*?)\)', forecast_data["weather_data"][3]['date']).group(1) + ":" +  forecast_data["weather_data"][3]['weather'] + "　"
-                + re.search(r'\((.*?)\)', forecast_data["weather_data"][4]['date']).group(1) + ":" +  forecast_data["weather_data"][4]['weather'] + "\n"
-                + re.search(r'\((.*?)\)', forecast_data["weather_data"][5]['date']).group(1) + ":" +  forecast_data["weather_data"][5]['weather'] + "　"
-                + re.search(r'\((.*?)\)', forecast_data["weather_data"][6]['date']).group(1) + ":" +  forecast_data["weather_data"][6]['weather'] + "\n")
-        
+        forecast_text = (forecast_data["weather_data"][0]['weather_icon'] + "　" + "↑" + forecast_data["weather_data"][0]['high_temp'] + "°" + "↓" + forecast_data["weather_data"][0]['low_temp'] + "°" + "\n" 
+            + "00~06" + ":" + forecast_data["today_probabilities"][0] + "%" + "　" + "06~12" + ":" + forecast_data["today_probabilities"][1] + "%" + "\n"
+            + "12~18" + ":" + forecast_data["today_probabilities"][2] + "%" + "　" + "18~24" + ":" + forecast_data["today_probabilities"][3] + "%" + "\n"
+            + "\n"
+            + forecast_data["weather_data"][1]['weekday'] + " " + forecast_data["weather_data"][2]['weekday'] + " " + forecast_data["weather_data"][3]['weekday'] + " " + forecast_data["weather_data"][4]['weekday'] + " " + forecast_data["weather_data"][5]['weekday'] + " " + forecast_data["weather_data"][6]['weekday'] + "\n"
+            + forecast_data["weather_data"][1]['weather_icon'] + "      " + forecast_data["weather_data"][2]['weather_icon'] + "      " + forecast_data["weather_data"][3]['weather_icon'] + "      " + forecast_data["weather_data"][4]['weather_icon'] + "      " + forecast_data["weather_data"][5]['weather_icon'] + "      " + forecast_data["weather_data"][6]['weather_icon'])
         if self.show_margin:
-            self.weather_label.config(text=forecast_text)
+           self.weather_label.config(text=forecast_text)
         else:
             self.canvas.itemconfig(self.weather_label, text=forecast_text, anchor="center", justify="center")
 
