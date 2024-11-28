@@ -166,6 +166,7 @@ class ImageModeScreen:
         else:
             self.canvas = tk.Canvas(self.root, bg='white')
             self.canvas.pack(fill=tk.BOTH, expand=True)
+            self.canvas_image = self.canvas.create_image(0, 0, anchor="nw")
 
             # 時計を表示
             if self.show_time:
@@ -249,6 +250,7 @@ class ImageModeScreen:
     def show_weather_without_margin_widget(self):
         # 天気を表示するラベルを作成し、配置
         self.weather_label = self.canvas.create_text(self.root.winfo_screenwidth() // 1.3, self.root.winfo_screenheight() - 175, font=('calibri', WEATHER_FONT_SIZE, 'bold'), fill="white")
+        self.weather_image = self.canvas.create_image(0, 0)
 
         # １時間ごとに天気更新
         self.update_weather()
@@ -422,8 +424,7 @@ class ImageModeScreen:
             self.label.configure(image=self.photo)
             self.label.image = self.photo
         else:
-            image_id = self.canvas.create_image(0, 0, anchor="nw", image=self.photo)
-            self.canvas.tag_lower(image_id)
+            self.canvas.itemconfig(self.canvas_image, image=self.photo)
     
     def update_background_color(self):
 
