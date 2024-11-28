@@ -1,170 +1,158 @@
 import requests
 from bs4 import BeautifulSoup
-import re
+import os
+from PIL import Image
 
 def get_precipitation_forecast():
-
     try:
         # 気象情報サイトのURL
-        url = f"https://tenki.jp/forecast/5/26/5110/23230/"
+        url = "https://tenki.jp/forecast/5/26/5110/23230/"
 
         # HTTPリクエストを送信してページのHTMLを取得
         response = requests.get(url)
-        if response.status_code == 200:
+        response.raise_for_status()  # HTTPステータスコードを確認
+        soup = BeautifulSoup(response.content, "html.parser")
 
-            # HTMLをパースしてBeautifulSoupオブジェクトを作成
-            soup = BeautifulSoup(response.content, "html.parser")
+        # 天気データ初期化
+        weather_text = "--"
+        weather_image_path = ""
+        high_temperature_value = "--"
+        low_temperature_value = "--"
+        probabilities = []
+        today_and_tomorrow_weather_data = []
+        nine_days_weather_data = []
 
-            # 天気
-            weather_text = ""
-            # 最高気温
-            high_temperature_value = ""
-            # 降水確率を格納するリスト
-            probabilities = []
+        # 天気
+        weather_telop = soup.find('p', class_='weather-telop')
+        if weather_telop:
+            weather_text = weather_telop.text.strip()
 
-            # classがweather-telopのp要素を取得
-            weather_telop = soup.find('p', class_='weather-telop')
+        # 最高気温
+        high_temp_dd = soup.find('dd', class_='high-temp temp')
+        if high_temp_dd:
+            high_temp_span = high_temp_dd.find('span', class_='value')
+            if high_temp_span:
+                high_temperature_value = high_temp_span.text.strip()
 
-            # テキストを取得
-            if weather_telop:
-                weather_text = weather_telop.text
-            else:
-                weather_text = "--"
+        # 最低気温
+        low_temp_dd = soup.find('dd', class_='low-temp temp')
+        if low_temp_dd:
+            low_temp_span = low_temp_dd.find('span', class_='value')
+            if low_temp_span:
+                low_temperature_value = low_temp_span.text.strip()
 
+        # 降水確率
+        rain_probability_tr = soup.find('tr', class_='rain-probability')
+        if rain_probability_tr:
+            probability_tds = rain_probability_tr.find_all('td')
+            for td in probability_tds:
+                probability_value = td.text.strip().replace('%', '') if td.text.strip() else "--"
+                probabilities.append(probability_value)
 
-            # classがhigh-temp tempのdd要素を取得
-            temperature_dd = soup.find('dd', class_='high-temp temp')
+        # 天気画像パス取得
+        weather_image_path = get_weather_image(weather_text)
 
-            # 最高温度を取得
-            if temperature_dd:
-                temperature_span = temperature_dd.find('span', class_='value')
-                if temperature_span:
-                    high_temperature_value = temperature_span.text
-                else:
-                    high_temperature_value = "--"
-            else:
-                print("要素が見つかりませんでした")
-            
-
-            # classがlow-temp tempのdd要素を取得
-            temperature_dd = soup.find('dd', class_='low-temp temp')
-
-            # 最高温度を取得
-            if temperature_dd:
-                temperature_span = temperature_dd.find('span', class_='value')
-                if temperature_span:
-                    low_temperature_value = temperature_span.text
-                else:
-                    low_temperature_value = "--"
-            else:
-                print("要素が見つかりませんでした")
-
-
-            # classがrain-probabilityのtr要素を取得
-            rain_probability_tr = soup.find('tr', class_='rain-probability')
-
-            # 降水確率を取得
-            if rain_probability_tr:
-                probability_tds = rain_probability_tr.find_all('td')  # 全てのtd要素を取得
-                for td in probability_tds:
-                    probability_span = td.find('span', class_='unit')
-                    if probability_span:
-                        probability_value = td.text.replace('%', '')  # %を削除して数値のみを取得
-                        probabilities.append(probability_value)
-                    else:
-                        probabilities.append("--")  # 確率が見つからない場合はNoneを追加
-            else:
-                print("要素が見つかりませんでした")
-
-            
-            # 今日と明日の天気を取得
-            # 天気データを格納するリスト
-            today_and_tomorrow_weather_data = []
-            # forecast-days-wrap clearfixの中のみを対象にする
-            forecast_wrap = soup.find('div', class_='forecast-days-wrap clearfix')
+        # 今日と明日の天気
+        forecast_wrap = soup.find('div', class_='forecast-days-wrap clearfix')
+        if forecast_wrap:
             for section in forecast_wrap.find_all('section'):
-                date = section.find('h3').get_text().strip()  # 日付と曜日
-                
-                # 正規表現を使って「11月17日(日)」のように抽出
-                date_match = re.search(r'(\d{1,2}月\d{1,2}日)\((.*?)\)', date)
-                if date_match:
-                    date = f"{date_match.group(1)}({date_match.group(2)})"  # 日付と曜日のフォーマットを整える
+                date = section.find('h3').text.strip() if section.find('h3') else "--"
+                weather = section.find('p', class_='weather-telop').text.strip() if section.find('p', class_='weather-telop') else "--"
+                high_temp = section.find('dd', class_='high-temp temp').find('span', class_='value').text.strip() if section.find('dd', class_='high-temp temp') else "--"
+                low_temp = section.find('dd', class_='low-temp temp').find('span', class_='value').text.strip() if section.find('dd', class_='low-temp temp') else "--"
+                precip = section.find('tr', class_='rain-probability').find_all('td')[2].text.strip() if section.find('tr', class_='rain-probability') else "--"
+                weather_image_path = get_weather_image(weather)
 
-                weather = section.find('p', class_='weather-telop').get_text().strip()  # 天気
-                high_temp = section.find('dd', class_='high-temp temp').find('span', class_='value').get_text().strip()  # 最高気温
-                low_temp = section.find('dd', class_='low-temp temp').find('span', class_='value').get_text().strip()  # 最低気温
-                precip = section.find('tr', class_='rain-probability').find_all('td')[2].get_text().strip()  # 降水確率
-
-                # 抽出したデータを辞書形式で格納
                 today_and_tomorrow_weather_data.append({
                     'date': date,
                     'weather': weather,
                     'high_temp': high_temp,
                     'low_temp': low_temp,
-                    'precip': precip
+                    'precip': precip,
+                    'weather_image_path': weather_image_path
                 })
-            
 
-            # ９日間の天気を取得
-            # 天気テーブルを抽出
-            forecast_table = soup.find('table', class_='forecast-point-week forecast-days-long')
-            # 各日の天気情報を格納するリスト
-            nine_days_weather_data = []
-            # 各行を取得
-            days = forecast_table.find_all('tr')
-
-            # 日付、天気、気温、降水確率を抽出
-            for i, day in enumerate(days):
-                # 日付と曜日
-                if i == 0:
-                    dates = day.find_all('td', class_='cityday')
+        # 9日間の天気
+        forecast_table = soup.find('table', class_='forecast-point-week forecast-days-long')
+        if forecast_table:
+            rows = forecast_table.find_all('tr')
+            for i, row in enumerate(rows):
+                if i == 0:  # 日付
+                    dates = row.find_all('td', class_='cityday')
                     for date in dates:
-                        date_text = date.get_text(strip=True)
+                        date_text = date.text.strip() if date else "--"
                         nine_days_weather_data.append({'date': date_text})
-                
-                # 天気情報
-                elif i == 1:
-                    weathers = day.find_all('td', class_='weather-icon')
+                elif i == 1:  # 天気
+                    weathers = row.find_all('td', class_='weather-icon')
                     for j, weather in enumerate(weathers):
-                        weather_desc = weather.find('p').get_text(strip=True)
+                        weather_desc = weather.find('p').text.strip() if weather.find('p') else "--"
                         nine_days_weather_data[j]['weather'] = weather_desc
-                
-                # 気温情報
-                elif i == 2:
-                    temperatures = day.find_all('td')
-                    for j, temp in enumerate(temperatures):  # 最初のtdは日付なのでスキップ
-                        high_temp = temp.find_all('p')[0].get_text(strip=True)
-                        low_temp = temp.find_all('p')[1].get_text(strip=True)
+                        nine_days_weather_data[j]['weather_image_path'] = get_weather_image(weather_desc)
+                elif i == 2:  # 気温
+                    temperatures = row.find_all('td')
+                    for j, temp in enumerate(temperatures):
+                        high_temp = temp.find_all('p')[0].text.strip() if len(temp.find_all('p')) > 0 else "--"
+                        low_temp = temp.find_all('p')[1].text.strip() if len(temp.find_all('p')) > 1 else "--"
                         nine_days_weather_data[j]['high_temp'] = high_temp
                         nine_days_weather_data[j]['low_temp'] = low_temp
-                
-                # 降水確率情報
-                elif i == 3:
-                    precipitations = day.find_all('td')
-                    for j, precip in enumerate(precipitations):  # 最初のtdは日付なのでスキップ
-                        precip = precip.find('p').get_text(strip=True)
-                        nine_days_weather_data[j]['precip'] = precip
+                elif i == 3:  # 降水確率
+                    precipitations = row.find_all('td')
+                    for j, precip in enumerate(precipitations):
+                        precip_text = precip.find('p').text.strip() if precip.find('p') else "--"
+                        nine_days_weather_data[j]['precip'] = precip_text
 
-            return {
-                "weather": weather_text,
-                "high_temperature_value": high_temperature_value,
-                "low_temperature_value": low_temperature_value,
-                "probabilities": probabilities,
-                "weather_data": today_and_tomorrow_weather_data + nine_days_weather_data
-            }
-        
-    except requests.exceptions.RequestException as e:
-        # リクエストが失敗した場合の処理
-        print("天気取得でエラーが発生しました:")
+        # print(
+        #     "weather", weather_text,
+        #     "high_temperature_value", high_temperature_value,
+        #     "low_temperature_value", low_temperature_value,
+        #     "probabilities", probabilities,
+        #     "weather_image_path", weather_image_path,
+        #     "weather_data", today_and_tomorrow_weather_data + nine_days_weather_data)
 
         return {
-            "weather": "--",
-            "high_temperature_value": "--",
-            "low_temperature_value": "--",
-            "probabilities": ["--", "--", "--", "--"],
-            "weather_data": []
+            "weather": weather_text,
+            "high_temperature_value": high_temperature_value,
+            "low_temperature_value": low_temperature_value,
+            "probabilities": probabilities,
+            "weather_image_path": weather_image_path,
+            "weather_data": today_and_tomorrow_weather_data + nine_days_weather_data
         }
-    
-    else:
-        return "サーバーからデータを取得できませんでした。"
 
+    except requests.exceptions.RequestException as e:
+        print(f"HTTPリクエストエラー: {e}")
+    except Exception as e:
+        print(f"予期せぬエラー: {e}")
+
+    return {
+        "weather": "--",
+        "high_temperature_value": "--",
+        "low_temperature_value": "--",
+        "probabilities": ["--", "--", "--", "--"],
+        "weather_image_path": "",
+        "weather_data": []
+    }
+
+def get_weather_image(weather_text, image_folder="utils/weather_images"):
+    # 天気テキストと画像ファイル名の対応表
+    weather_to_image_map = {
+        "晴": "sunny.png",
+        "雨": "rainy.png",
+        "曇": "cloudy.png",
+        "雪": "snowy.png",
+        "暴風雨": "storm.png",
+        "暴風雪": "snowy.png",
+        "晴後雨": "sunny_or_rainy.png",
+        "晴時々曇": "sunny_or_rainy.png",
+        "曇時々晴": "sunny_or_rainy.png",
+    }
+
+    # 天気画像フォルダ内の対応する画像ファイル名を取得
+    image_file_name = weather_to_image_map.get(weather_text, None)
+    if not image_file_name:
+        print(f"対応する天気画像が見つかりません: {weather_text}")
+        return ""
+
+    # 画像ファイルの完全なパスを取得
+    image_path = os.path.join(image_folder, image_file_name)
+
+    return image_path
