@@ -250,7 +250,6 @@ class ImageModeScreen:
     def show_weather_without_margin_widget(self):
         # 天気を表示するラベルを作成し、配置
         self.weather_label = self.canvas.create_text(self.root.winfo_screenwidth() // 1.3, self.root.winfo_screenheight() - 175, font=('calibri', WEATHER_FONT_SIZE, 'bold'), fill="white")
-        self.weather_image = self.canvas.create_image(0, 0)
 
         # １時間ごとに天気更新
         self.update_weather()
