@@ -14,32 +14,9 @@ def get_precipitation_forecast():
         soup = BeautifulSoup(response.content, "html.parser")
 
         # 天気データ初期化
-        weather_text = "--"
-        weather_image_path = ""
-        high_temperature_value = "--"
-        low_temperature_value = "--"
-        probabilities = []
+        today_probabilities = []
         today_and_tomorrow_weather_data = []
         nine_days_weather_data = []
-
-        # 天気
-        weather_telop = soup.find('p', class_='weather-telop')
-        if weather_telop:
-            weather_text = weather_telop.text.strip()
-
-        # 最高気温
-        high_temp_dd = soup.find('dd', class_='high-temp temp')
-        if high_temp_dd:
-            high_temp_span = high_temp_dd.find('span', class_='value')
-            if high_temp_span:
-                high_temperature_value = high_temp_span.text.strip()
-
-        # 最低気温
-        low_temp_dd = soup.find('dd', class_='low-temp temp')
-        if low_temp_dd:
-            low_temp_span = low_temp_dd.find('span', class_='value')
-            if low_temp_span:
-                low_temperature_value = low_temp_span.text.strip()
 
         # 降水確率
         rain_probability_tr = soup.find('tr', class_='rain-probability')
@@ -47,10 +24,7 @@ def get_precipitation_forecast():
             probability_tds = rain_probability_tr.find_all('td')
             for td in probability_tds:
                 probability_value = td.text.strip().replace('%', '') if td.text.strip() else "--"
-                probabilities.append(probability_value)
-
-        # 天気画像パス取得
-        weather_image_path = get_weather_image(weather_text)
+                today_probabilities.append(probability_value)
 
         # 今日と明日の天気
         forecast_wrap = soup.find('div', class_='forecast-days-wrap clearfix')
@@ -101,20 +75,12 @@ def get_precipitation_forecast():
                         precip_text = precip.find('p').text.strip() if precip.find('p') else "--"
                         nine_days_weather_data[j]['precip'] = precip_text
 
-        # print(
-        #     "weather", weather_text,
-        #     "high_temperature_value", high_temperature_value,
-        #     "low_temperature_value", low_temperature_value,
-        #     "probabilities", probabilities,
-        #     "weather_image_path", weather_image_path,
-        #     "weather_data", today_and_tomorrow_weather_data + nine_days_weather_data)
+        print(
+            "today_probabilities", today_probabilities,
+            "weather_data", today_and_tomorrow_weather_data + nine_days_weather_data)
 
         return {
-            "weather": weather_text,
-            "high_temperature_value": high_temperature_value,
-            "low_temperature_value": low_temperature_value,
-            "probabilities": probabilities,
-            "weather_image_path": weather_image_path,
+            "today_probabilities": today_probabilities,
             "weather_data": today_and_tomorrow_weather_data + nine_days_weather_data
         }
 
@@ -124,11 +90,7 @@ def get_precipitation_forecast():
         print(f"予期せぬエラー: {e}")
 
     return {
-        "weather": "--",
-        "high_temperature_value": "--",
-        "low_temperature_value": "--",
-        "probabilities": ["--", "--", "--", "--"],
-        "weather_image_path": "",
+        "today_probabilities": ["--", "--", "--", "--"],
         "weather_data": []
     }
 
