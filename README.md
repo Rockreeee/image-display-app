@@ -60,15 +60,18 @@ pip install pillow
 ```
 
 opencvインストール方法
-
 ```zsh
 pip install opencv-python
 ```
 
 beautifulsoup4インストール方法
-
 ```zsh
 pip install beautifulsoup4
+```
+
+Noto Color Emojiフォントのインストール
+```
+sudo apt install fonts-noto-color-emoji
 ```
 
 # 📓利用方法

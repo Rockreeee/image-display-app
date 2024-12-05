@@ -8,6 +8,7 @@ def load_settings():
     # デフォルト値
     default_settings = {
         "mode": "Image",
+        "auto_image": False,
         "image_path": "",
         "video_path": "",
         "interval": "3600",

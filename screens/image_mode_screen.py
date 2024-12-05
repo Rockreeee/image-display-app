@@ -3,6 +3,7 @@ import screens.image_mode_setting_screen as image_mode_setting_screen
 import utils.settings_manager as settings_manager
 import utils.fetch_weather as fetch_weather
 import utils.music_player as music_player
+import utils.fetch_image_from_pixel as fetch_image_from_pixel
 import os
 import random
 from datetime import datetime
@@ -49,6 +50,7 @@ class ImageModeScreen:
     # 設定をロードし、各変数に設定
     def initialize_settings(self):
         settings = settings_manager.load_settings()
+        self.auto_image = settings.get('auto_image')
         self.image_path = settings.get('image_path')
         self.interval = int(settings.get('interval'))
         self.show_margin = settings.get('show_margin')
@@ -258,14 +260,14 @@ class ImageModeScreen:
     # 天気のUI更新
     def update_weather(self):
         # 天気データの取得
-        print("天気を更新します。")
+        # print("天気を更新します。")
         forecast_data = fetch_weather.get_precipitation_forecast()
         forecast_text = (forecast_data["weather_data"][0]['weather_icon'] + "　" + "↑" + forecast_data["weather_data"][0]['high_temp'] + "°" + "↓" + forecast_data["weather_data"][0]['low_temp'] + "°" + "\n" 
             + "00~06" + ":" + forecast_data["today_probabilities"][0] + "%" + "　" + "06~12" + ":" + forecast_data["today_probabilities"][1] + "%" + "\n"
             + "12~18" + ":" + forecast_data["today_probabilities"][2] + "%" + "　" + "18~24" + ":" + forecast_data["today_probabilities"][3] + "%" + "\n"
             + "\n"
             + forecast_data["weather_data"][1]['weekday'] + " " + forecast_data["weather_data"][2]['weekday'] + " " + forecast_data["weather_data"][3]['weekday'] + " " + forecast_data["weather_data"][4]['weekday'] + " " + forecast_data["weather_data"][5]['weekday'] + " " + forecast_data["weather_data"][6]['weekday'] + "\n"
-            + forecast_data["weather_data"][1]['weather_icon'] + "      " + forecast_data["weather_data"][2]['weather_icon'] + "      " + forecast_data["weather_data"][3]['weather_icon'] + "      " + forecast_data["weather_data"][4]['weather_icon'] + "      " + forecast_data["weather_data"][5]['weather_icon'] + "      " + forecast_data["weather_data"][6]['weather_icon'])
+            + forecast_data["weather_data"][1]['weather_icon'] + "     " + forecast_data["weather_data"][2]['weather_icon'] + "     " + forecast_data["weather_data"][3]['weather_icon'] + "     " + forecast_data["weather_data"][4]['weather_icon'] + "     " + forecast_data["weather_data"][5]['weather_icon'] + "     " + forecast_data["weather_data"][6]['weather_icon'])
         if self.show_margin:
            self.weather_label.config(text=forecast_text)
         else:
@@ -298,9 +300,9 @@ class ImageModeScreen:
 
         # ランダムな画像を選択
         random_image_path = self.make_random_file_path(path=self.image_path, files=self.image_files)
+        img = fetch_image_from_pixel.fetch_image_from_url() if self.auto_image else Image.open(random_image_path)
 
         # 画像UIを配置
-        img = Image.open(random_image_path)
         img_width, img_height = img.size
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight() - clock_height - weather_height
@@ -323,9 +325,9 @@ class ImageModeScreen:
     def update_image_without_margin_widget(self):
         # ランダムな画像を選択
         random_image_path = self.make_random_file_path(path=self.image_path, files=self.image_files)
+        img = fetch_image_from_pixel.fetch_image_from_url() if self.auto_image else Image.open(random_image_path)
 
         # 画像UIを配置
-        img = Image.open(random_image_path)
         img_width, img_height = img.size
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
