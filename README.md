@@ -90,7 +90,8 @@ python main.py
 
 ### - 設定
 
-- Image Path: 画像フォルダのパス
+- Auto Image: 画像をネット上から自動取得
+- Image Path: 画像フォルダのパス(Auto Imageをオフにした場合、このフォルダの中から画像を表示します)
 - Image Display Interval: 画像が切り替わるまでの時間
 - Image With Margin: 画像の周りに余白を表示するか否か
 - Automatic Brightness Adjustment: 明るさを自動調整するか否か
