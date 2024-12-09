@@ -1,7 +1,7 @@
 import tkinter as tk
 import screens.image_mode_setting_screen as image_mode_setting_screen
 import utils.settings_manager as settings_manager
-import utils.fetch_weather as fetch_weather
+import utils.fetch_weather_from_tenkijp as fetch_weather_from_tenkijp
 import utils.music_player as music_player
 import utils.fetch_image_from_pixel as fetch_image_from_pixel
 import os
@@ -261,7 +261,7 @@ class ImageModeScreen:
     def update_weather(self):
         # 天気データの取得
         # print("天気を更新します。")
-        forecast_data = fetch_weather.get_precipitation_forecast()
+        forecast_data = fetch_weather_from_tenkijp.get_precipitation_forecast()
         forecast_text = (forecast_data["weather_data"][0]['weather_icon'] + "　" + "↑" + forecast_data["weather_data"][0]['high_temp'] + "°" + "↓" + forecast_data["weather_data"][0]['low_temp'] + "°" + "\n" 
             + "00~06" + ":" + forecast_data["today_probabilities"][0] + "%" + "　" + "06~12" + ":" + forecast_data["today_probabilities"][1] + "%" + "\n"
             + "12~18" + ":" + forecast_data["today_probabilities"][2] + "%" + "　" + "18~24" + ":" + forecast_data["today_probabilities"][3] + "%" + "\n"
@@ -365,13 +365,13 @@ class ImageModeScreen:
             # 昼の時間帯は明るさを1.0に設定
             self.image_brightness = 1.0
             self.label_brightness = 1.0
-            print("今は昼間（09:00〜17:00）です。")
+            # print("今は昼間（09:00〜17:00）です。")
         
         elif now >= datetime.strptime("21:00", "%H:%M").time() or now < datetime.strptime("05:00", "%H:%M").time():
             # 夜の時間帯は明るさを0.2に設定
             self.image_brightness = 0.2
             self.label_brightness = 0
-            print("今は夜間（21:00〜05:00）です。")
+            # print("今は夜間（21:00〜05:00）です。")
         
         else:
             # 変化する時間帯（05:00 - 09:00、17:00 - 21:00）は徐々に変化させる
@@ -380,14 +380,14 @@ class ImageModeScreen:
                 hours_since_6am = (datetime.combine(datetime.today(), now) - datetime.strptime("05:00", "%H:%M")).seconds / 3600
                 self.image_brightness = 0.2 + (0.8 * (hours_since_6am / 4))
                 self.label_brightness = 0 + (1.0 * (hours_since_6am / 4))
-                print(f"今は朝（05:00〜09:00）です。徐々に明るくしています。")
+                # print(f"今は朝（05:00〜09:00）です。徐々に明るくしています。")
 
             elif now >= datetime.strptime("17:00", "%H:%M").time() and now < datetime.strptime("21:00", "%H:%M").time():
                 # 夕方、昼から夜にかけて徐々に暗くする
                 hours_since_5pm = (datetime.combine(datetime.today(), now) - datetime.strptime("17:00", "%H:%M")).seconds / 3600
                 self.image_brightness = 1.0 - (0.8 * (hours_since_5pm / 4))
                 self.label_brightness = 1.0 - (1.0 * (hours_since_5pm / 4))
-                print(f"今は夕方（17:00〜21:00）です。徐々に暗くしています。")
+                # print(f"今は夕方（17:00〜21:00）です。徐々に暗くしています。")
 
         # 背景色や画像の更新処理
         self.update_background_color()

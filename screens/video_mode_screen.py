@@ -1,6 +1,6 @@
 import screens.video_mode_setting_screen as video_mode_setting_screen
 import utils.settings_manager as settings_manager
-import utils.fetch_weather as fetch_weather
+import utils.fetch_weather_from_tenkijp as fetch_weather_from_tenkijp
 import utils.music_player as music_player
 import os
 import random
@@ -174,7 +174,7 @@ class VideoModeScreen:
     def update_weather(self):
         # 天気データの取得
         print("天気を更新します。")
-        forecast_data = fetch_weather.get_precipitation_forecast()
+        forecast_data = fetch_weather_from_tenkijp.get_precipitation_forecast()
         forecast_text = ("     " + forecast_data["weather"] + "     " 
                 + "↑" + forecast_data["high_temperature_value"] + "°" + " " 
                 + "↓" + forecast_data["low_temperature_value"] + "°" + "\n" 

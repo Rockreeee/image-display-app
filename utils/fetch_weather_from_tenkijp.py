@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-from PIL import Image
 
 def get_precipitation_forecast():
     try:
@@ -109,12 +108,13 @@ def get_weather_icon(weather_text):
         "暴風雨": "⛈️",
         "暴風雪": "☃️",
         "晴後雨": "🌦️",
+        "晴時々雨": "🌦️",
+        "曇時々雨": "🌦️",
+        "晴一時雨": "🌦️",
         "晴時々曇": "🌤️",
         "曇時々晴": "🌤️",
         "晴のち曇": "🌤️",
         "曇のち晴": "🌤️",
-        "曇時々雨": "🌦️",
-        "晴一時雨": "🌦️",
     }
 
     # 天気画像フォルダ内の対応する画像ファイル名を取得
