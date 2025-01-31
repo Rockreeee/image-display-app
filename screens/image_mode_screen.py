@@ -17,10 +17,9 @@ import re
 # 日付UIとディスプレイ距離
 MARGIN_ABOVE_CLOCK = 50
 # 文字の大きさ
-DATE_FONT_SIZE = 30
-TIME_FONT_SIZE = 75
-WEATHER_ICON_SIZE = 50
-WEATHER_FONT_SIZE = 25
+DATE_FONT_SIZE = 28
+TIME_FONT_SIZE = 70
+WEATHER_FONT_SIZE = 20
 # 画像の表示領域に対して何割表示するか 0~1.0
 CONSTANT_MARGIN = 0.7
 # 明るくなる時間
@@ -211,8 +210,8 @@ class ImageModeScreen:
     # 時計のUI作成
     def show_clock_without_margin_widget(self):
         # ラベルを作成
-        self.date_label = self.canvas.create_text(self.root.winfo_screenwidth() // 4, self.root.winfo_screenheight() - 300, font=('calibri', DATE_FONT_SIZE, 'bold'), fill="white")
-        self.time_label = self.canvas.create_text(self.root.winfo_screenwidth() // 4, self.root.winfo_screenheight() - 150, font=('calibri', TIME_FONT_SIZE, 'bold'), fill="white")
+        self.date_label = self.canvas.create_text(self.root.winfo_screenwidth() // 3.5, self.root.winfo_screenheight() - 300, font=('calibri', DATE_FONT_SIZE, 'bold'), fill="white")
+        self.time_label = self.canvas.create_text(self.root.winfo_screenwidth() // 3.5, self.root.winfo_screenheight() - 150, font=('calibri', TIME_FONT_SIZE, 'bold'), fill="white")
 
         # 日付と曜日、時間を更新する関数を初回呼び出し
         self.update_time()
@@ -252,7 +251,7 @@ class ImageModeScreen:
     # 天気のUI作成
     def show_weather_without_margin_widget(self):
         # 天気を表示するラベルを作成し、配置
-        self.weather_label = self.canvas.create_text(self.root.winfo_screenwidth() // 1.3, self.root.winfo_screenheight() - 175, font=('calibri', WEATHER_FONT_SIZE, 'bold'), fill="white")
+        self.weather_label = self.canvas.create_text(self.root.winfo_screenwidth() // 1.33, self.root.winfo_screenheight() - 200, font=('calibri', WEATHER_FONT_SIZE, 'bold'), fill="white")
 
         # １時間ごとに天気更新
         self.update_weather()
@@ -262,16 +261,17 @@ class ImageModeScreen:
         # 天気データの取得
         # print("天気を更新します。")
         forecast_data = fetch_weather_from_tenkijp.get_precipitation_forecast()
-        forecast_text = (forecast_data["weather_data"][0]['weather_icon'] + "　" + "↑" + forecast_data["weather_data"][0]['high_temp'] + "°" + "↓" + forecast_data["weather_data"][0]['low_temp'] + "°" + "\n" 
-            + "00~06" + ":" + forecast_data["today_probabilities"][0] + "%" + "　" + "06~12" + ":" + forecast_data["today_probabilities"][1] + "%" + "\n"
-            + "12~18" + ":" + forecast_data["today_probabilities"][2] + "%" + "　" + "18~24" + ":" + forecast_data["today_probabilities"][3] + "%" + "\n"
-            + "\n"
-            + forecast_data["weather_data"][1]['weekday'] + " " + forecast_data["weather_data"][2]['weekday'] + " " + forecast_data["weather_data"][3]['weekday'] + " " + forecast_data["weather_data"][4]['weekday'] + " " + forecast_data["weather_data"][5]['weekday'] + " " + forecast_data["weather_data"][6]['weekday'] + "\n"
-            + forecast_data["weather_data"][1]['weather_icon'] + "     " + forecast_data["weather_data"][2]['weather_icon'] + "     " + forecast_data["weather_data"][3]['weather_icon'] + "     " + forecast_data["weather_data"][4]['weather_icon'] + "     " + forecast_data["weather_data"][5]['weather_icon'] + "     " + forecast_data["weather_data"][6]['weather_icon'])
-        if self.show_margin:
-           self.weather_label.config(text=forecast_text)
-        else:
-            self.canvas.itemconfig(self.weather_label, text=forecast_text, anchor="center", justify="center")
+        if forecast_data != None:
+            forecast_text = (forecast_data["weather_data"][0]['weather_icon'] + "　" + "↑" + forecast_data["weather_data"][0]['high_temp'] + "°" + "↓" + forecast_data["weather_data"][0]['low_temp'] + "°" + "\n" 
+                + "00~06" + ":" + forecast_data["today_probabilities"][0] + "%" + "　" + "06~12" + ":" + forecast_data["today_probabilities"][1] + "%" + "\n"
+                + "12~18" + ":" + forecast_data["today_probabilities"][2] + "%" + "　" + "18~24" + ":" + forecast_data["today_probabilities"][3] + "%" + "\n"
+                + "\n"
+                + forecast_data["weather_data"][1]['weekday'] + " " + forecast_data["weather_data"][2]['weekday'] + " " + forecast_data["weather_data"][3]['weekday'] + " " + forecast_data["weather_data"][4]['weekday'] + " " + forecast_data["weather_data"][5]['weekday'] + " " + forecast_data["weather_data"][6]['weekday'] + "\n"
+                + forecast_data["weather_data"][1]['weather_icon'] + "     " + forecast_data["weather_data"][2]['weather_icon'] + "     " + forecast_data["weather_data"][3]['weather_icon'] + "     " + forecast_data["weather_data"][4]['weather_icon'] + "     " + forecast_data["weather_data"][5]['weather_icon'] + "     " + forecast_data["weather_data"][6]['weather_icon'])
+            if self.show_margin:
+                self.weather_label.config(text=forecast_text)
+            else:
+                self.canvas.itemconfig(self.weather_label, text=forecast_text, anchor="center", justify="center")
 
         # 次の更新まで待機
         self.root_after_id_weather = self.root.after(3600 * 1000, self.update_weather)
