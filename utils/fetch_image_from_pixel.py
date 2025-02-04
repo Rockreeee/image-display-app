@@ -21,10 +21,10 @@ def find_existing_image():
             # URLの存在確認
             response = requests.head(image_url)
             if response.status_code == 200:
-                print(f"画像が見つかりました: {image_url}")
+                # print(f"画像が見つかりました: {image_url}")
                 return image_url
-            else:
-                print(f"画像が見つかりませんでした: {image_url}")
+            # else:
+            #     print(f"画像が見つかりませんでした: {image_url}")
         except requests.exceptions.RequestException as e:
             print(f"エラーが発生しました: {e}")
 
