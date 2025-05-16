@@ -128,7 +128,7 @@ def get_weather_icon(weather_text):
     image_icon = weather_to_image_map.get(weather_text, None)
     if not image_icon:
         print(f"対応する天気画像が見つかりません: {weather_text}")
-        return ""
+        return "\u2601"
 
     return image_icon
 
