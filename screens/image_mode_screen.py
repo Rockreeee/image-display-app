@@ -120,6 +120,8 @@ class ImageModeScreen:
                 self.canvas.itemconfig(self.time_label, fill=color)
             if hasattr(self, 'weather_label'):
                 self.canvas.itemconfig(self.weather_label, fill=color)
+            if hasattr(self, 'train_schedule_label'):
+                self.canvas.itemconfig(self.train_schedule_label, fill=color)
 
     # 明るさを調整する関数
     def image_brightness_adjustment(self, event):
@@ -241,7 +243,7 @@ class ImageModeScreen:
     # 列車時刻表のUI作成
     def show_train_schedule_without_margin_widget(self):
         # 列車時刻表を表示するラベルを作成し、配置
-        self.train_schedule_label = self.canvas.create_text(self.root.winfo_screenwidth() // 1.33, self.root.winfo_screenheight() - 350, font=('calibri', WEATHER_FONT_SIZE, 'bold'), fill="white")
+        self.train_schedule_label = self.canvas.create_text(self.root.winfo_screenwidth() // 1.33, self.root.winfo_screenheight() - 400, font=('calibri', WEATHER_FONT_SIZE, 'bold'), fill="white")
 
         # 列車時刻表のUI更新
         self.update_train_schedule()
