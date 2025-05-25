@@ -31,6 +31,7 @@ class ImageModeSettingScreen:
         self.automatic_brightness_var = tk.BooleanVar(value=settings.get('automatic_brightness'))
         self.show_time_var = tk.BooleanVar(value=settings.get('show_time'))
         self.show_weather_var = tk.BooleanVar(value=settings.get('show_weather'))
+        self.show_train_schedule_var = tk.BooleanVar(value=settings.get('show_train_schedule'))
         self.sound_path_var = tk.StringVar(value=settings.get('sound_path'))
         self.sound_mode_var = tk.StringVar(value=settings.get('sound_mode'))
 
@@ -45,14 +46,15 @@ class ImageModeSettingScreen:
         self.create_checkbutton(settings_frame, "Automatic Brightness Adjustment", self.automatic_brightness_var, row=3)
         self.create_checkbutton(settings_frame, "Show Clock", self.show_time_var, row=4)
         self.create_checkbutton(settings_frame, "Show Weather", self.show_weather_var, row=5)
-        self.create_label_entry_button(settings_frame, "Sound Path:", self.sound_path_var, self.select_sound_path, row=6)
-        self.create_radiobutton(settings_frame, "Sound Off", self.sound_mode_var, "0", row=7)
-        self.create_radiobutton(settings_frame, "Sound On", self.sound_mode_var, "1", row=8)
-        self.create_radiobutton(settings_frame, "Morning Sound Only", self.sound_mode_var, "2", row=9)
+        self.create_checkbutton(settings_frame, "Show Train Schedule", self.show_train_schedule_var, row=6)
+        self.create_label_entry_button(settings_frame, "Sound Path:", self.sound_path_var, self.select_sound_path, row=7)
+        self.create_radiobutton(settings_frame, "Sound Off", self.sound_mode_var, "0", row=8)
+        self.create_radiobutton(settings_frame, "Sound On", self.sound_mode_var, "1", row=9)
+        self.create_radiobutton(settings_frame, "Morning Sound Only", self.sound_mode_var, "2", row=10)
 
         # アクションボタン
-        tk.Button(settings_frame, text="<< Back", command=self.back_action).grid(row=10, column=0, pady=10)
-        tk.Button(settings_frame, text="Start", command=self.start_action).grid(row=10, column=2, pady=10)
+        tk.Button(settings_frame, text="<< Back", command=self.back_action).grid(row=11, column=0, pady=10)
+        tk.Button(settings_frame, text="Start", command=self.start_action).grid(row=11, column=2, pady=10)
 
     def create_label_entry_button(self, frame, text, variable, command, row):
         """ラベル、エントリ、ボタンのウィジェットを作成"""
@@ -102,6 +104,7 @@ class ImageModeSettingScreen:
             "automatic_brightness": self.automatic_brightness_var.get(),
             "show_time": self.show_time_var.get(),
             "show_weather": self.show_weather_var.get(),
+            "show_train_schedule": self.show_train_schedule_var.get(),
             "sound_path": self.sound_path_var.get(),
             "sound_mode": self.sound_mode_var.get(),
         }

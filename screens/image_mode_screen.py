@@ -11,8 +11,8 @@ import threading
 from tkinter import messagebox
 from time import strftime, localtime
 from PIL import Image, ImageEnhance, ImageTk
-import re
-
+import utils.fetch_train_schedule_to_nagoya as fetch_train_schedule_to_nagoya
+import utils.fetch_train_schedule_to_toyota as fetch_train_schedule_to_toyota
 # start: カスタム設定
 # 日付UIとディスプレイ距離
 MARGIN_ABOVE_CLOCK = 50
@@ -55,6 +55,7 @@ class ImageModeScreen:
         self.automatic_brightness = settings.get('automatic_brightness')
         self.show_time = settings.get('show_time')
         self.show_weather = settings.get('show_weather')
+        self.show_train_schedule = settings.get('show_train_schedule')
         self.sound_path = settings.get('sound_path')
         self.sound_mode = settings.get('sound_mode')
 
@@ -171,6 +172,10 @@ class ImageModeScreen:
         if self.show_weather:
             self.show_weather_without_margin_widget()
 
+        # 列車時刻表を表示
+        if self.show_train_schedule:
+            self.show_train_schedule_without_margin_widget()
+
         # 余白なし画像を表示
         self.update_image_without_margin_widget()
 
@@ -232,6 +237,31 @@ class ImageModeScreen:
 
         # 次の更新まで待機
         self.root_after_id_weather = self.root.after(3600 * 1000, self.update_weather)
+
+    # 列車時刻表のUI作成
+    def show_train_schedule_without_margin_widget(self):
+        # 列車時刻表を表示するラベルを作成し、配置
+        self.train_schedule_label = self.canvas.create_text(self.root.winfo_screenwidth() // 1.33, self.root.winfo_screenheight() - 350, font=('calibri', WEATHER_FONT_SIZE, 'bold'), fill="white")
+
+        # 列車時刻表のUI更新
+        self.update_train_schedule()
+
+    # 列車時刻表のUI更新
+    def update_train_schedule(self):
+        # 列車時刻表データの取得
+        train_schedule_dataA = fetch_train_schedule_to_nagoya.get_next_trains()
+        train_schedule_dataB = fetch_train_schedule_to_toyota.get_next_trains()
+        if train_schedule_dataA != None and train_schedule_dataB != None:
+            train_schedule_text = (
+                fetch_train_schedule_to_nagoya.DESTINATION + "　" + fetch_train_schedule_to_toyota.DESTINATION + "\n"
+                + train_schedule_dataA[0]['time'] + "　　　" + train_schedule_dataB[0]['time'] + "\n"
+                + train_schedule_dataA[1]['time'] + "　　　" + train_schedule_dataB[1]['time'] + "\n"
+                + train_schedule_dataA[2]['time'] + "　　　" + train_schedule_dataB[2]['time'] + "\n")
+            
+            self.canvas.itemconfig(self.train_schedule_label, text=train_schedule_text, anchor="center", justify="center")
+
+        # 次の更新まで待機（5分）
+        self.root_after_id_train_schedule = self.root.after(300 * 1000, self.update_train_schedule)
 
     def next_image(self, event):
         self.root.after_cancel(self.root_after_id_image_without_margin)
@@ -362,6 +392,8 @@ class ImageModeScreen:
             self.root.after_cancel(self.root_after_id_time)
         if hasattr(self, 'root_after_id_weather'):
             self.root.after_cancel(self.root_after_id_weather)
+        if hasattr(self, 'root_after_id_train_schedule'):
+            self.root.after_cancel(self.root_after_id_train_schedule)
         if hasattr(self, 'root_after_id_image_without_margin'):
             self.root.after_cancel(self.root_after_id_image_without_margin)
         if hasattr(self, 'root_after_id_brightness_adjustment'):
