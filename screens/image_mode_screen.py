@@ -52,7 +52,6 @@ class ImageModeScreen:
         self.auto_image = settings.get('auto_image')
         self.image_path = settings.get('image_path')
         self.interval = int(settings.get('interval'))
-        self.show_margin = settings.get('show_margin')
         self.automatic_brightness = settings.get('automatic_brightness')
         self.show_time = settings.get('show_time')
         self.show_weather = settings.get('show_weather')
@@ -108,7 +107,18 @@ class ImageModeScreen:
             self.label_brightness -= 0.2
             if self.label_brightness < 0:
                 self.label_brightness = 1
-            self.update_background_color()
+            
+            # RGB値を16進数に変換
+            brightness = int(255 * self.label_brightness)
+            color = f"#{brightness:02x}{brightness:02x}{brightness:02x}"
+            
+            # ラベルの色を更新
+            if hasattr(self, 'date_label'):
+                self.canvas.itemconfig(self.date_label, fill=color)
+            if hasattr(self, 'time_label'):
+                self.canvas.itemconfig(self.time_label, fill=color)
+            if hasattr(self, 'weather_label'):
+                self.canvas.itemconfig(self.weather_label, fill=color)
 
     # 明るさを調整する関数
     def image_brightness_adjustment(self, event):
@@ -149,38 +159,20 @@ class ImageModeScreen:
 
     # UI作成
     def create_widgets(self):
+        self.canvas = tk.Canvas(self.root, bg='white')
+        self.canvas.pack(fill=tk.BOTH, expand=True)
+        self.canvas_image = self.canvas.create_image(0, 0, anchor="nw")
 
-        # 余白を表示
-        if self.show_margin:
-            self.label = tk.Label(self.root, bg='white')
-            self.label.pack(fill=tk.BOTH, expand=True, side="bottom")
-            # 時計を表示
-            if self.show_time:
-                self.show_clock_with_margin_widget()
-                
-            # 天気を表示
-            if self.show_weather:
-                self.show_weather_with_margin_widget()
+        # 時計を表示
+        if self.show_time:
+            self.show_clock_without_margin_widget()
 
-            # 余白あり画像表示
-            self.update_image_with_margin_widget()
-                
-        else:
-            self.canvas = tk.Canvas(self.root, bg='white')
-            self.canvas.pack(fill=tk.BOTH, expand=True)
-            self.canvas_image = self.canvas.create_image(0, 0, anchor="nw")
+        # 天気を表示
+        if self.show_weather:
+            self.show_weather_without_margin_widget()
 
-            # 時計を表示
-            if self.show_time:
-                self.show_clock_without_margin_widget()
-
-            # 天気を表示
-            if self.show_weather:
-                self.show_weather_without_margin_widget()
-
-            # 余白なし画像を表示
-            self.update_image_without_margin_widget()
-
+        # 余白なし画像を表示
+        self.update_image_without_margin_widget()
 
         # 自動明るさ調整
         if self.automatic_brightness:
@@ -192,20 +184,6 @@ class ImageModeScreen:
                 self.play_sound(self.sound_path)
             elif self.sound_mode == "2":
                 self.automatic_sound_booking()
-
-
-    # 時計のUI作成
-    def show_clock_with_margin_widget(self):
-        # ラベルを作成
-        self.date_label = tk.Label(self.root, font=('calibri', DATE_FONT_SIZE, 'bold'), bg='white', fg='gray')
-        self.time_label = tk.Label(self.root, font=('calibri', TIME_FONT_SIZE, 'bold'), bg='white', fg='gray')
-
-        # ラベルの高さを取得して時間ラベルを配置
-        self.date_label.pack(pady=(MARGIN_ABOVE_CLOCK, 0))
-        self.time_label.pack(pady=(self.date_label.winfo_height() + MARGIN_ABOVE_CLOCK, 0))
-
-        # 日付と曜日、時間を更新する関数を初回呼び出し
-        self.update_time()
 
     # 時計のUI作成
     def show_clock_without_margin_widget(self):
@@ -223,30 +201,11 @@ class ImageModeScreen:
         current_date = strftime('%Y-%m-%d %A', localtime())
 
         # ラベルのテキストを更新
-        if self.show_margin:
-            self.time_label.config(text=current_time)
-            self.date_label.config(text=current_date)
-        else:
-            self.canvas.itemconfig(self.time_label, text=current_time)
-            self.canvas.itemconfig(self.date_label, text=current_date)
+        self.canvas.itemconfig(self.time_label, text=current_time)
+        self.canvas.itemconfig(self.date_label, text=current_date)
 
         # 次の更新まで待機
         self.root_after_id_time = self.root.after(1000, self.update_time)
-
-
-    # 天気のUI作成
-    def show_weather_with_margin_widget(self):
-        # 天気を表示するラベルを作成
-        self.weather_label = tk.Label(self.root, font=('calibri', WEATHER_FONT_SIZE, 'bold'), bg='white', fg='gray')
-
-        # ラベルの高さを取得して天気ラベルを配置
-        clock_height = 0
-        if self.show_time:
-            clock_height = self.date_label.winfo_height() + self.time_label.winfo_height()
-        self.weather_label.pack(pady=(MARGIN_ABOVE_CLOCK + clock_height, 0))
-
-        # １時間ごとに天気更新
-        self.update_weather()
 
     # 天気のUI作成
     def show_weather_without_margin_widget(self):
@@ -268,58 +227,15 @@ class ImageModeScreen:
                 + "\n"
                 + forecast_data["weather_data"][1]['weekday'] + " " + forecast_data["weather_data"][2]['weekday'] + " " + forecast_data["weather_data"][3]['weekday'] + " " + forecast_data["weather_data"][4]['weekday'] + " " + forecast_data["weather_data"][5]['weekday'] + " " + forecast_data["weather_data"][6]['weekday'] + "\n"
                 + forecast_data["weather_data"][1]['weather_icon'] + "     " + forecast_data["weather_data"][2]['weather_icon'] + "     " + forecast_data["weather_data"][3]['weather_icon'] + "     " + forecast_data["weather_data"][4]['weather_icon'] + "     " + forecast_data["weather_data"][5]['weather_icon'] + "     " + forecast_data["weather_data"][6]['weather_icon'])
-            if self.show_margin:
-                self.weather_label.config(text=forecast_text)
-            else:
-                self.canvas.itemconfig(self.weather_label, text=forecast_text, anchor="center", justify="center")
+
+            self.canvas.itemconfig(self.weather_label, text=forecast_text, anchor="center", justify="center")
 
         # 次の更新まで待機
         self.root_after_id_weather = self.root.after(3600 * 1000, self.update_weather)
 
     def next_image(self, event):
-        if self.show_margin:
-            self.root.after_cancel(self.root_after_id_image_with_margin)
-            self.update_image_with_margin_widget()
-        else:
-            self.root.after_cancel(self.root_after_id_image_without_margin)
-            self.update_image_without_margin_widget()
-
-
-    # 画像（マージンあり）のUI作成
-    def update_image_with_margin_widget(self):
-        # その他要素の高さを取得
-        clock_height = 0
-        if self.show_time:
-            date_label_height = self.date_label.winfo_height()
-            time_label_height = self.time_label.winfo_height()
-            clock_height = MARGIN_ABOVE_CLOCK + date_label_height + time_label_height
-
-        weather_height = 0
-        if self.show_weather:
-            weather_height = self.weather_label.winfo_height()
-
-        # ランダムな画像を選択
-        random_image_path = self.make_random_file_path(path=self.image_path, files=self.image_files)
-        img = fetch_image_from_pixel.fetch_image_from_url() if self.auto_image else Image.open(random_image_path)
-
-        # 画像UIを配置
-        img_width, img_height = img.size
-        screen_width = self.root.winfo_screenwidth()
-        screen_height = self.root.winfo_screenheight() - clock_height - weather_height
-        
-        if img_width > screen_width or img_height > screen_height:
-            ratio = min(screen_width / img_width, screen_height / img_height)
-            new_width = int(img_width * ratio * CONSTANT_MARGIN)
-            new_height = int(img_height * ratio * CONSTANT_MARGIN)
-            img = img.resize((new_width, new_height), Image.LANCZOS)
-        
-        # 明るさを調整するためのBrightnessオブジェクトを作成し、ファクターを設定
-        self.enhancer = ImageEnhance.Brightness(img)
-        self.update_image_brightness()
-
-        # 次の更新まで待機
-        self.root_after_id_image_with_margin = self.root.after(self.interval * 1000, self.update_image_with_margin_widget)
-    
+        self.root.after_cancel(self.root_after_id_image_without_margin)
+        self.update_image_without_margin_widget()
 
     # 画像（マージンなし）のUI作成
     def update_image_without_margin_widget(self):
@@ -364,13 +280,11 @@ class ImageModeScreen:
         if now >= datetime.strptime("09:00", "%H:%M").time() and now < datetime.strptime("17:00", "%H:%M").time():
             # 昼の時間帯は明るさを1.0に設定
             self.image_brightness = 1.0
-            self.label_brightness = 1.0
             # print("今は昼間（09:00〜17:00）です。")
         
         elif now >= datetime.strptime("21:00", "%H:%M").time() or now < datetime.strptime("05:00", "%H:%M").time():
             # 夜の時間帯は明るさを0.2に設定
             self.image_brightness = 0.2
-            self.label_brightness = 0
             # print("今は夜間（21:00〜05:00）です。")
         
         else:
@@ -379,18 +293,15 @@ class ImageModeScreen:
                 # 朝、夜から昼にかけて徐々に明るくする
                 hours_since_6am = (datetime.combine(datetime.today(), now) - datetime.strptime("05:00", "%H:%M")).seconds / 3600
                 self.image_brightness = 0.2 + (0.8 * (hours_since_6am / 4))
-                self.label_brightness = 0 + (1.0 * (hours_since_6am / 4))
                 # print(f"今は朝（05:00〜09:00）です。徐々に明るくしています。")
 
             elif now >= datetime.strptime("17:00", "%H:%M").time() and now < datetime.strptime("21:00", "%H:%M").time():
                 # 夕方、昼から夜にかけて徐々に暗くする
                 hours_since_5pm = (datetime.combine(datetime.today(), now) - datetime.strptime("17:00", "%H:%M")).seconds / 3600
                 self.image_brightness = 1.0 - (0.8 * (hours_since_5pm / 4))
-                self.label_brightness = 1.0 - (1.0 * (hours_since_5pm / 4))
                 # print(f"今は夕方（17:00〜21:00）です。徐々に暗くしています。")
 
         # 背景色や画像の更新処理
-        self.update_background_color()
         self.update_image_brightness()
         
         # 次の1時間後に再度明るさ調整を予約
@@ -413,37 +324,7 @@ class ImageModeScreen:
     def update_image_brightness(self):
         adjusted_image = self.enhancer.enhance(self.image_brightness)
         self.photo = ImageTk.PhotoImage(adjusted_image) # 何故かself.しないといけない
-        if self.show_margin:
-            self.label.configure(image=self.photo)
-            self.label.image = self.photo
-        else:
-            self.canvas.itemconfig(self.canvas_image, image=self.photo)
-    
-    def update_background_color(self):
-
-        if self.show_margin:
-            original_color_value = int(self.label_brightness * 255)
-            bg_color = f'#{original_color_value:02x}{original_color_value:02x}{original_color_value:02x}'
-            if 50 <= original_color_value and original_color_value <= 200:
-                fg_color = 'white'
-            else:
-                fg_color = 'grey'
-            self.root.configure(background=bg_color)
-            self.label.config(bg=bg_color)
-            if self.show_time:
-                self.date_label.config(background=bg_color, foreground=fg_color)
-                self.time_label.config(background=bg_color, foreground=fg_color)
-            if self.show_weather:
-                self.weather_label.config(background=bg_color, foreground=fg_color)
-        else:
-            original_color_value = int(self.label_brightness * 255)
-            fg_color = f'#{original_color_value:02x}{original_color_value:02x}{original_color_value:02x}'
-            # if self.show_time:
-            #     self.canvas.itemconfig(self.date_label, fill=fg_color)
-            #     self.canvas.itemconfig(self.time_label, fill=fg_color)
-            # if self.show_weather:
-            #     self.canvas.itemconfig(self.weather_label, fill=fg_color)
-
+        self.canvas.itemconfig(self.canvas_image, image=self.photo)
 
     # 音楽再生
     def play_sound(self, path):
@@ -481,8 +362,6 @@ class ImageModeScreen:
             self.root.after_cancel(self.root_after_id_time)
         if hasattr(self, 'root_after_id_weather'):
             self.root.after_cancel(self.root_after_id_weather)
-        if hasattr(self, 'root_after_id_image_with_margin'):
-            self.root.after_cancel(self.root_after_id_image_with_margin)
         if hasattr(self, 'root_after_id_image_without_margin'):
             self.root.after_cancel(self.root_after_id_image_without_margin)
         if hasattr(self, 'root_after_id_brightness_adjustment'):
