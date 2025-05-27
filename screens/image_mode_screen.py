@@ -11,8 +11,9 @@ import threading
 from tkinter import messagebox
 from time import strftime, localtime
 from PIL import Image, ImageEnhance, ImageTk
-import utils.fetch_train_schedule_to_nagoya as fetch_train_schedule_to_nagoya
-import utils.fetch_train_schedule_to_toyota as fetch_train_schedule_to_toyota
+import utils.fetch_train_schedule as fetch_train_schedule
+import json
+
 # start: カスタム設定
 # 日付UIとディスプレイ距離
 MARGIN_ABOVE_CLOCK = 50
@@ -30,6 +31,11 @@ TIME_DARKNESS_HOUR = 21
 TIME_DARKNESS_MINUTE = 0
 # 音楽が止まるまでの時間（分）
 MUSIC_STOP_MINUTES = 10
+# 列車時刻表ファイルパス
+TRAIN_SCHEDULE_FILE_PATH_A = "data/train_schedule_for_nagoya.json"
+TRAIN_SCHEDULE_FILE_PATH_B = "data/train_schedule_for_toyota.json"
+DESTINATION_A = "For Nagoya"
+DESTINATION_B = "For Toyota"
 # end: カスタム設定
 
 class ImageModeScreen:
@@ -251,14 +257,22 @@ class ImageModeScreen:
     # 列車時刻表のUI更新
     def update_train_schedule(self):
         # 列車時刻表データの取得
-        train_schedule_dataA = fetch_train_schedule_to_nagoya.get_next_trains()
-        train_schedule_dataB = fetch_train_schedule_to_toyota.get_next_trains()
-        if train_schedule_dataA != None and train_schedule_dataB != None:
+        # JSONファイルを読み込む
+        train_schedule_dataA = None
+        train_schedule_dataB = None
+        with open(TRAIN_SCHEDULE_FILE_PATH_A, 'r') as file:
+            train_schedule_dataA = json.load(file)
+        with open(TRAIN_SCHEDULE_FILE_PATH_B, 'r') as file:
+            train_schedule_dataB = json.load(file)
+
+        next_trainsA = fetch_train_schedule.get_next_trains(train_schedule_dataA)
+        next_trainsB = fetch_train_schedule.get_next_trains(train_schedule_dataB)
+        if next_trainsA != None and next_trainsB != None:
             train_schedule_text = (
-                fetch_train_schedule_to_nagoya.DESTINATION + "　" + fetch_train_schedule_to_toyota.DESTINATION + "\n"
-                + train_schedule_dataA[0]['time'] + "　　　" + train_schedule_dataB[0]['time'] + "\n"
-                + train_schedule_dataA[1]['time'] + "　　　" + train_schedule_dataB[1]['time'] + "\n"
-                + train_schedule_dataA[2]['time'] + "　　　" + train_schedule_dataB[2]['time'] + "\n")
+                DESTINATION_A + "　" + DESTINATION_B + "\n"
+                + next_trainsA[0]['time'] + "　　　" + next_trainsB[0]['time'] + "\n"
+                + next_trainsA[1]['time'] + "　　　" + next_trainsB[1]['time'] + "\n"
+                + next_trainsA[2]['time'] + "　　　" + next_trainsB[2]['time'] + "\n")
             
             self.canvas.itemconfig(self.train_schedule_label, text=train_schedule_text, anchor="center", justify="center")
 

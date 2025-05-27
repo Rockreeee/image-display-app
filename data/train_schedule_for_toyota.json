@@ -1,10 +1,4 @@
-import json
-from datetime import datetime, time
-
-# 電車の時刻表データ
-DESTINATION = "For Toyota"
-
-TRAIN_SCHEDULE = {
+{
     "weekday": [
         {"time": "05:15"}, 
         {"time": "05:28"}, 
@@ -168,31 +162,3 @@ TRAIN_SCHEDULE = {
         {"time": "00:00"}
     ]
 }
-
-def get_next_trains():
-    """
-    現在時刻から最も近い電車3つを返す
-    
-    Returns:
-        list: 次の電車3つの情報を含むリスト
-    """
-    now = datetime.now()
-    current_time = now.time()
-    
-    # 平日か休日かを判定
-    is_weekday = now.weekday() < 5
-    schedule = TRAIN_SCHEDULE["weekday"] if is_weekday else TRAIN_SCHEDULE["weekend"]
-    
-    # 現在時刻以降の電車をフィルタリング
-    upcoming_trains = []
-    for train in schedule:
-        train_time = datetime.strptime(train["time"], "%H:%M").time()
-        if train_time >= current_time:
-            upcoming_trains.append(train)
-    
-    # 現在時刻以降の電車がない場合は翌日の最初の電車を追加
-    if not upcoming_trains:
-        upcoming_trains = schedule[:3]
-    
-    # 最大3つまでの電車を返す
-    return upcoming_trains[:3]
