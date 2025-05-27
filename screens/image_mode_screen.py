@@ -32,8 +32,10 @@ TIME_DARKNESS_MINUTE = 0
 # 音楽が止まるまでの時間（分）
 MUSIC_STOP_MINUTES = 10
 # 列車時刻表ファイルパス
-TRAIN_SCHEDULE_FILE_PATH_A = "data/train_schedule_for_nagoya.json"
-TRAIN_SCHEDULE_FILE_PATH_B = "data/train_schedule_for_toyota.json"
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
+TRAIN_SCHEDULE_FILE_PATH_A = os.path.join(BASE_DIR, "data", "train_schedule_for_nagoya.json")
+TRAIN_SCHEDULE_FILE_PATH_B = os.path.join(BASE_DIR, "data", "train_schedule_for_toyota.json")
 DESTINATION_A = "For Nagoya"
 DESTINATION_B = "For Toyota"
 # end: カスタム設定
@@ -260,6 +262,7 @@ class ImageModeScreen:
         # JSONファイルを読み込む
         train_schedule_dataA = None
         train_schedule_dataB = None
+        print(TRAIN_SCHEDULE_FILE_PATH_A)
         with open(TRAIN_SCHEDULE_FILE_PATH_A, 'r') as file:
             train_schedule_dataA = json.load(file)
         with open(TRAIN_SCHEDULE_FILE_PATH_B, 'r') as file:
