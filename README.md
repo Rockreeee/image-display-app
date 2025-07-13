@@ -10,8 +10,10 @@
 
 # 📋主な機能
 - 画像表示：写真やアートをランダムに表示
+- 動画表示：動画ファイルをランダムに再生
 - 時計表示：シンプルな時計を画面に
 - 天気と降水確率の確認：日々の天気
+- 列車時刻表表示：最寄り駅の列車時刻を表示
 - 自動調整：1時間ごとの明るさ調整
 - 単語学習：単語を自動表示し、日々の学習に
 
@@ -41,6 +43,8 @@
     - **tkinter** (UI構築)
     - **opencv-python** (動画サポートのため)
     - **beautifulsoup4** (ウェブデータ取得用)
+    - **pygame** (動画再生用)
+    - **numpy** (動画処理用)
 
 # 🚀インストール手順
 
@@ -69,6 +73,16 @@ beautifulsoup4インストール方法
 pip install beautifulsoup4
 ```
 
+pygameインストール方法
+```zsh
+pip install pygame
+```
+
+numpyインストール方法
+```zsh
+pip install numpy
+```
+
 Noto Color Emojiフォントのインストール
 ```
 sudo apt install fonts-noto-color-emoji
@@ -81,8 +95,9 @@ python main.py
 # 👏 動作画面の様子
 <img src="https://github.com/Rockreeee/image-display-app/raw/main/asset/7.png" width="200" height="230" /> 
 
-２つのモードがあります
+３つのモードがあります
 - 画像表示モード
+- 動画表示モード
 - 勉強モード
 
 ## 🖼 Image Mode
@@ -114,7 +129,31 @@ python main.py
 
 
 ## 📺 Movie Mode
-- 実装中
+<img src="asset/5.png"/>
+
+### - 設定
+
+- Video Path: 動画フォルダのパス
+- Video Display Interval: 動画が切り替わるまでの時間
+- Automatic Brightness Adjustment: 明るさを自動調整するか否か
+- Show Clock: 時間を表示するか否か
+- Show Weather: 天気を表示するか否か
+- Show Train Schedule: 列車時刻表を表示するか否か
+- Sound Path: 音楽フォルダのパス
+- Sound Off: 音楽オフ
+- Sound On: 音楽オン
+- Morning Sound Only: 朝の10分間音楽を流す
+- Preserve Quality: 動画品質を保持するか否か
+- Play Video Audio: 動画の音声を再生するか否か
+
+### - キーバインド
+- \<Escape key> or \<q key>: 終了する
+- \<f key>: フルスクリーン切り替え
+- \<h key>: カーソル表示切り替え
+- \<v key>: 音量の調整
+- \<m key>: ミュートの切り替え
+- \<i key>: 画像の明るさ調整
+- \<Space key>: 次の動画に移動する
 
 
 ## 🧠 Study Mode

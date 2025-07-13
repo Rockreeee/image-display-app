@@ -1,6 +1,6 @@
 import tkinter as tk
 import screens.image_mode_setting_screen as image_mode_setting_screen
-# import screens.video_mode_setting_screen as video_mode_setting_screen
+import screens.video_mode_setting_screen as video_mode_setting_screen
 import screens.study_mode_setting_screen as study_mode_setting_screen
 import utils.settings_manager as settings_manager
 
@@ -33,8 +33,8 @@ class HomeScreen:
 
     def create_radio_buttons(self):
         """ラジオボタンを作成"""
-        modes = [("Image", "Image"), ("Study", "Study")]
-        # modes = [("Image", "Image"), ("Video", "Video"), ("Study", "Study")]
+        # modes = [("Image", "Image"), ("Study", "Study")]
+        modes = [("Image", "Image"), ("Video", "Video"), ("Study", "Study")]
         for mode_name, mode_value in modes:
             tk.Radiobutton(self.root, text=mode_name, variable=self.mode, value=mode_value).pack()
 
@@ -46,8 +46,8 @@ class HomeScreen:
         self.root.destroy()
         if selected_mode == "Image":
             image_mode_setting_screen.create_screen()
-        # if selected_mode == "Video":
-        #     video_mode_setting_screen.create_screen()
+        if selected_mode == "Video":
+            video_mode_setting_screen.create_screen()
         elif selected_mode == "Study":
             study_mode_setting_screen.create_screen()
 
