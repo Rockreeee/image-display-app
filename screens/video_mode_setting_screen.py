@@ -2,7 +2,9 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 import utils.settings_manager as settings_manager
 import screens.home_screen as home_screen
-import screens.video_mode_screen_pygame as video_mode_screen
+import screens.video_mode_screen_pygame as video_mode_screen_pygame
+import screens.video_mode_screen_vlc as video_mode_screen_vlc
+import screens.video_mode_screen_simple as video_mode_screen_simple
 
 class VideoModeSettingScreen:
     def __init__(self, root):
@@ -34,6 +36,7 @@ class VideoModeSettingScreen:
         self.show_train_schedule_var = tk.BooleanVar(value=settings.get('show_train_schedule'))
         self.sound_path_var = tk.StringVar(value=settings.get('sound_path'))
         self.sound_mode_var = tk.StringVar(value=settings.get('sound_mode'))
+        self.video_engine_var = tk.StringVar(value=settings.get('video_engine', 'simple'))  # デフォルトはSimple
 
     def create_widgets(self):
         settings_frame = tk.Frame(self.root)
@@ -52,9 +55,15 @@ class VideoModeSettingScreen:
         self.create_radiobutton(settings_frame, "Sound On", self.sound_mode_var, "1", row=9)
         self.create_radiobutton(settings_frame, "Morning Sound Only", self.sound_mode_var, "2", row=10)
 
+        # 動画エンジン選択
+        tk.Label(settings_frame, text="Video Engine:").grid(row=11, column=0, sticky="w")
+        tk.Radiobutton(settings_frame, text="Simple (Recommended)", variable=self.video_engine_var, value="simple").grid(row=11, column=1, sticky="w")
+        tk.Radiobutton(settings_frame, text="VLC", variable=self.video_engine_var, value="vlc").grid(row=12, column=1, sticky="w")
+        tk.Radiobutton(settings_frame, text="Pygame+OpenCV", variable=self.video_engine_var, value="pygame").grid(row=13, column=1, sticky="w")
+
         # アクションボタン
-        tk.Button(settings_frame, text="<< Back", command=self.back_action).grid(row=11, column=0, pady=10)
-        tk.Button(settings_frame, text="Start", command=self.start_action).grid(row=11, column=2, pady=10)
+        tk.Button(settings_frame, text="<< Back", command=self.back_action).grid(row=14, column=0, pady=10)
+        tk.Button(settings_frame, text="Start", command=self.start_action).grid(row=14, column=2, pady=10)
 
     def create_label_entry_button(self, frame, text, variable, command, row):
         """ラベル、エントリ、ボタンのウィジェットを作成"""
@@ -106,13 +115,20 @@ class VideoModeSettingScreen:
             "show_train_schedule": self.show_train_schedule_var.get(),
             "sound_path": self.sound_path_var.get(),
             "sound_mode": self.sound_mode_var.get(),
+            "video_engine": self.video_engine_var.get(),
         }
 
         # 設定を保存
         settings_manager.save_settings(**settings)
         self.root.destroy()
 
-        video_mode_screen.create_screen()
+        # 選択された動画エンジンに応じて起動
+        if self.video_engine_var.get() == "vlc":
+            video_mode_screen_vlc.create_screen()
+        elif self.video_engine_var.get() == "pygame":
+            video_mode_screen_pygame.create_screen()
+        else:  # simple
+            video_mode_screen_simple.create_screen()
 
     def back_action(self):
         """戻るボタンのアクション"""
