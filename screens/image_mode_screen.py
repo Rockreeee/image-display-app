@@ -36,6 +36,7 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
 TRAIN_SCHEDULE_FILE_PATH_A = os.path.join(BASE_DIR, "data", "train_schedule_a.json")
 TRAIN_SCHEDULE_FILE_PATH_B = os.path.join(BASE_DIR, "data", "train_schedule_b.json")
+TRAIN_SCHEDULE_FILE_PATH_C = os.path.join(BASE_DIR, "data", "train_schedule_c.json")
 # end: カスタム設定
 
 class ImageModeScreen:
@@ -249,7 +250,7 @@ class ImageModeScreen:
     # 列車時刻表のUI作成
     def show_train_schedule_without_margin_widget(self):
         # 列車時刻表を表示するラベルを作成し、配置
-        self.train_schedule_label = self.canvas.create_text(self.root.winfo_screenwidth() // 1.33, self.root.winfo_screenheight() - 400, font=('calibri', WEATHER_FONT_SIZE, 'bold'), fill="white")
+        self.train_schedule_label = self.canvas.create_text(self.root.winfo_screenwidth() // 1.33, self.root.winfo_screenheight() - 500, font=('calibri', WEATHER_FONT_SIZE, 'bold'), fill="white")
 
         # 列車時刻表のUI更新
         self.update_train_schedule()
@@ -264,20 +265,30 @@ class ImageModeScreen:
             train_schedule_dataA = json.load(file)
         with open(TRAIN_SCHEDULE_FILE_PATH_B, 'r') as file:
             train_schedule_dataB = json.load(file)
+        with open(TRAIN_SCHEDULE_FILE_PATH_C, 'r') as file:
+            train_schedule_dataC = json.load(file)
 
         next_trainsA = fetch_train_schedule.get_next_trains(train_schedule_dataA)
         next_trainsB = fetch_train_schedule.get_next_trains(train_schedule_dataB)
-        if next_trainsA != None and next_trainsB != None:
+        next_trainsC = fetch_train_schedule.get_next_trains(train_schedule_dataC)
+        if next_trainsA != None and next_trainsB != None and next_trainsC != None:
             train_schedule_text = (
-                train_schedule_dataA["destination"] + "　" + train_schedule_dataB["destination"] + "\n"
+                "【名城線】" + "\n"
+                + "　" + train_schedule_dataA["destination"] + "　　" + train_schedule_dataB["destination"] + "\n"
                 + next_trainsA[0]['time'] + "　　　" + next_trainsB[0]['time'] + "\n"
                 + next_trainsA[1]['time'] + "　　　" + next_trainsB[1]['time'] + "\n"
-                + next_trainsA[2]['time'] + "　　　" + next_trainsB[2]['time'] + "\n")
+                + next_trainsA[2]['time'] + "　　　" + next_trainsB[2]['time'] + "\n"
+                + "\n"
+                + "【上飯田線】" + "\n"
+                + train_schedule_dataC["destination"] + "\n"
+                + next_trainsC[0]['time'] + "\n"
+                + next_trainsC[1]['time'] + "\n"
+                + next_trainsC[2]['time'] + "\n")
             
             self.canvas.itemconfig(self.train_schedule_label, text=train_schedule_text, anchor="center", justify="center")
 
         # 次の更新まで待機（5分）
-        self.root_after_id_train_schedule = self.root.after(300 * 1000, self.update_train_schedule)
+        self.root_after_id_train_schedule = self.root.after(60 * 1000, self.update_train_schedule)
 
     def next_image(self, event):
         self.root.after_cancel(self.root_after_id_image_without_margin)
