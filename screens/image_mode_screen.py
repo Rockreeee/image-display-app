@@ -34,10 +34,8 @@ MUSIC_STOP_MINUTES = 10
 # 列車時刻表ファイルパス
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
-TRAIN_SCHEDULE_FILE_PATH_A = os.path.join(BASE_DIR, "data", "train_schedule_for_nagoya.json")
-TRAIN_SCHEDULE_FILE_PATH_B = os.path.join(BASE_DIR, "data", "train_schedule_for_toyota.json")
-DESTINATION_A = "For Nagoya"
-DESTINATION_B = "For Toyota"
+TRAIN_SCHEDULE_FILE_PATH_A = os.path.join(BASE_DIR, "data", "train_schedule_a.json")
+TRAIN_SCHEDULE_FILE_PATH_B = os.path.join(BASE_DIR, "data", "train_schedule_b.json")
 # end: カスタム設定
 
 class ImageModeScreen:
@@ -262,7 +260,6 @@ class ImageModeScreen:
         # JSONファイルを読み込む
         train_schedule_dataA = None
         train_schedule_dataB = None
-        print(TRAIN_SCHEDULE_FILE_PATH_A)
         with open(TRAIN_SCHEDULE_FILE_PATH_A, 'r') as file:
             train_schedule_dataA = json.load(file)
         with open(TRAIN_SCHEDULE_FILE_PATH_B, 'r') as file:
@@ -272,7 +269,7 @@ class ImageModeScreen:
         next_trainsB = fetch_train_schedule.get_next_trains(train_schedule_dataB)
         if next_trainsA != None and next_trainsB != None:
             train_schedule_text = (
-                DESTINATION_A + "　" + DESTINATION_B + "\n"
+                train_schedule_dataA["destination"] + "　" + train_schedule_dataB["destination"] + "\n"
                 + next_trainsA[0]['time'] + "　　　" + next_trainsB[0]['time'] + "\n"
                 + next_trainsA[1]['time'] + "　　　" + next_trainsB[1]['time'] + "\n"
                 + next_trainsA[2]['time'] + "　　　" + next_trainsB[2]['time'] + "\n")
