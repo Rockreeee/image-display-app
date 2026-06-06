@@ -2,10 +2,12 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
+import config
+
 def get_precipitation_forecast():
     try:
-        # 気象情報サイトのURL
-        url = "https://tenki.jp/forecast/5/26/5110/23103/"
+        # 気象情報サイトのURL(地域は config で設定)
+        url = config.WEATHER_FORECAST_URL
 
         # HTTPリクエストを送信してページのHTMLを取得
         response = requests.get(url)
@@ -93,9 +95,8 @@ def get_precipitation_forecast():
     except Exception as e:
         print(f"予期せぬエラー: {e}")
 
-    return {
-        None
-    }
+    # 取得に失敗した場合は None を返す(呼び出し側は None でスキップ判定する)
+    return None
 
 def get_weather_icon(weather_text):
     # 天気テキストと画像ファイル名の対応表

@@ -3,19 +3,14 @@ import random
 from PIL import Image
 from io import BytesIO
 
-# ベースURL
-base_url = "https://images.pexels.com/photos/{}/pexels-photo-{}.jpeg"
-
-# ランダムIDの範囲
-min_id = 0
-max_id = 18200000
+import config
 
 def find_existing_image():
     while True:
         # ランダムなIDを生成
-        random_id = random.randint(min_id, max_id)
+        random_id = random.randint(config.PEXELS_MIN_ID, config.PEXELS_MAX_ID)
         # 完全なURLを生成
-        image_url = base_url.format(random_id, random_id)
+        image_url = config.PEXELS_IMAGE_URL.format(random_id, random_id)
         
         try:
             # URLの存在確認
